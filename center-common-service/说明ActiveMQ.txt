@@ -1,0 +1,31 @@
+一、ActiveMQ常见问题:
+    1. 是否能正常发、收queue消息？
+        和spring整合，发送一条queue消息会自动提交，consumer可正常接收，接收完之后默认由spring立刻签收(已验证)
+
+    2. 是否能正常发、收topic消息？
+        和spring整合，发送一条topic消息会自动提交，多个consumer都可正常接收，接收完之后默认由spring立刻签收(已验证)，但是注意 ActiveMQ 5.14.2 版本
+        对于topic的消费有问题，请勿使用该版本。
+
+    3. 是否能消息重试？
+        发送一条topic消息，consumer端的JmsListenerContainerFactory设置为持久订阅且开启事务，当监听器在执行任务过程中出现抛异常时，该消息会被重新投递，
+        并且消息中的redeliveryCounter值+1(已验证)
+
+    4. 当消息重试超过最大重试次数之后怎么处理？
+
+
+    5. consumer接收到消息后，是否有多长时间没有相应Broker就会被当作timeOut的情况？
+
+
+    6. 是否支持在一个事务中发送多条消息？
+        ActiveMQ是支持的，但是JmsTemplate在发送完一条消息之后会自动commit，所以，使用JmsTemplate的不能进行进行在事务中发送多条消息之后，同时commit或者rollback，
+        要想实现此功能，需要拿到ConnectionFactory之后取到Connection，然后手动开启事务，之后再手动commit或rollback，当然，可以自己封装一个这样的方法，供其他地方
+        共同调用。
+
+    7.“提交(commit)”是针对生产者而言，而“确认签收(acknowledge)”是针对消费者而言？
+        生产者-》MQ服务器  和 MQ服务器-》消费者 是两个相互独立的过程(已验证)
+
+    8. replyTo的作用是什么？生产者设置这个属性和消费者设置这个属性产生的意图各自是什么？
+
+    9. 服务器端的ActiveMQ版本跟pom文件中的ActiveMQ版本不一致的话可以吗？
+        试过在pom中引用5.14.3，但在服务器端使用5.13.3测试过没有问题，但为了稳妥起见，建议两边的版本保持一致，另外，5.14.2版本在接收topic消息时常有不能正常消费
+        消息的情况出现，建议勿用这个版本

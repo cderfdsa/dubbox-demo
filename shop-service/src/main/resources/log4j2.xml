@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    status : 这个用于设置log4j2自身内部的信息输出,可以不设置,当设置成trace时,会看到log4j2内部各种详细输出
+    monitorInterval : Log4j能够自动检测修改配置文件和重新配置本身, 设置间隔秒数。
+-->
+<Configuration status="WARN" monitorInterval="300">
+    <!-- 自定义变量 start-->
+    <Properties>
+        <!-- 配置日志文件输出目录 -->
+        <Property name="LOG_HOME">/var/tmp/logs</Property>
+        <!-- 日志文件名 -->
+        <property name="LOG_NAME">${appName}.log</property>
+        <!-- 日志备份目录 -->
+        <property name="BACKUP_HOME">{LOG_HOME}/backup</property>
+    </Properties>
+    <!-- 自定义变量 start-->
+
+    <!-- 日志输出器 start-->
+    <Appenders>
+        <!--控制台日志输出器 -->
+        <Console name="consoleAppender" target="SYSTEM_OUT">
+            <!-- 控制台输出trace及以上级别的信息(onMatch),其他的直接拒绝(onMismatch) -->
+            <!--<ThresholdFilter level="trace" onMatch="ACCEPT" onMismatch="DENY"/>-->
+            <!-- 输出日志的格式 -->
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %L %M %msg%xEx%n"/>
+        </Console>
+
+        <!-- 应用日志输出器 ，并配置日志压缩格式(service.log.年份.gz) -->
+        <RollingRandomAccessFile name="appAppender"
+                                 immediateFlush="true" fileName="${LOG_HOME}/${LOG_NAME}"
+                                 filePattern="${LOG_HOME}/${LOG_NAME}.%d{yyyy-MM-dd}.log.gz">
+            <!--
+                %d{yyyy-MM-dd HH:mm:ss, SSS} : 日志生产时间
+                %p : 日志输出格式
+                %c : logger的名称
+                %m : 日志内容，即 logger.info("common")
+                %n : 换行符
+                %C : Java类名
+                %L : 日志输出所在行数
+                %M : 日志输出所在方法名
+                hostName : 本地机器名
+                hostAddress : 本地ip地址
+             -->
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %L %M -- %msg%xEx%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+            </Policies>
+        </RollingRandomAccessFile>
+
+        <!-- 独立日志,可以做到每个名称一个日志文件 http://logging.apache.org/log4j/2.x/faq.html#separate_log_files -->
+        <Routing name="routingAppender">
+            <Routes pattern="$${ctx:logName}">
+                <!-- 如果 ThreadContext 没有设置任何值给 logName，则这个日志会被选中  -->
+                <Route key="$${ctx:logName}" ref="consoleAppender"/>
+
+                <!-- 如果 ThreadContext 有给logName设置值，但是没有匹配路由匹配这个值，则这个日志会被选中 -->
+                <Route>
+                    <RollingRandomAccessFile name="rollingLog"
+                                             immediateFlush="true"
+                                             fileName="${LOG_HOME}/${ctx:logName}.log"
+                                             filePattern="${LOG_HOME}/${ctx:logName}.%d{yyyy-MM-dd}.log.gz">
+                        <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %L %M %msg%xEx%n"/>
+                        <SizeBasedTriggeringPolicy size="500MB" />
+                        <Policies>
+                            <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+                        </Policies>
+                    </RollingRandomAccessFile>
+                </Route>
+            </Routes>
+        </Routing>
+    </Appenders>
+    <!-- 日志输出器 end-->
+
+
+    <!-- 日志实例 start-->
+    <Loggers>
+        <!-- 根节点日志 -->
+        <root level="info">
+            <appender-ref ref="consoleAppender"/>
+            <appender-ref ref="appAppender"/>
+        </root>
+
+        <!-- 需要独立成一个文件的日志，日志名会根据LoggerWrapper.getSeparateWrapper()方法传入的名称来定 -->
+        <logger name="separate" level="info" includeLocation="true" additivity="false">
+            <appender-ref ref="routingAppender"/>
+        </logger>
+
+        <!-- 第三方日志系统 -->
+        <logger name="java.sql.PreparedStatement" level="debug"/>
+        <logger name="java.sql.Statement" level="debug"/>
+        <logger name="java.sql.ResultSet" level="debug"/>
+        <logger name="java.sql.Connection" level="debug"/>
+        <logger name="org.apache.ibatis" level="debug"/>
+        <logger name="org.springframework.jdbc" level="debug"/>
+        <logger name="org.springframework.transaction" level="debug"/>
+        <logger name="org.springframework.core" level="info"/>
+        <logger name="org.springframework.beans" level="info"/>
+        <logger name="org.springframework.aop" level="debug"/>
+        <logger name="org.springframework.context" level="info"/>
+        <logger name="org.springframework.web" level="info"/>
+        <logger name="org.apache.commons" level="debug"/>
+        <logger name="org.jboss.netty" level="warn"/>
+        <logger name="org.apache.http" level="warn"/>
+        <logger name="com.alibaba.dubbo" level="info"/>
+        <logger name="com.cyf.shop" level="warn"/>
+    </Loggers>
+    <!-- 日志实例 end-->
+</Configuration>

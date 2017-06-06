@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 存放手写的sql -->
+<mapper namespace="com.cyf.base.user.bean.User">
+    <!-- 根据登陆名获取用户信息 -->
+    <select id="getByLoginName" resultMap="beanMap">
+        SELECT <include refid="fields" />
+        FROM <include refid="table" />
+        WHERE (phone = #{loginName} or email = #{loginName} or usercode = #{loginName})
+    </select>
+
+    <!-- 根据登陆名获取用户信息 -->
+    <select id="getByUnionKey" resultMap="beanMap">
+        SELECT <include refid="fields" />
+        FROM <include refid="table" />
+        <where>
+            <if test="phone != null and phone!=''">
+                OR `phone` = #{phone}
+            </if>
+            <if test="email != null and email!=''">
+                OR `email` = #{email}
+            </if>
+            <if test="usercode != null and usercode!=''">
+                OR `usercode` = #{usercode}
+            </if>
+        </where>
+    </select>
+</mapper>

@@ -1,0 +1,458 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cyf.center.common.bean.TimerJob">
+	<sql id="table"> timer_job </sql>
+
+	<!-- 用于返回的bean对象 -->
+	<resultMap id="beanMap" type="com.cyf.center.common.bean.TimerJob">
+		<result column="id" property="id" jdbcType="BIGINT"/>
+		<result column="jobName" property="jobName" jdbcType="VARCHAR"/>
+		<result column="jobGroup" property="jobGroup" jdbcType="VARCHAR"/>
+		<result column="jobType" property="jobType" jdbcType="SMALLINT"/>
+		<result column="destination" property="destination" jdbcType="VARCHAR"/>
+		<result column="jobParamJson" property="jobParamJson" jdbcType="VARCHAR"/>
+		<result column="cronExpression" property="cronExpression" jdbcType="VARCHAR"/>
+		<result column="startTime" property="startTime" jdbcType="TIMESTAMP"/>
+		<result column="endTime" property="endTime" jdbcType="TIMESTAMP"/>
+		<result column="repeatCount" property="repeatCount" jdbcType="INTEGER"/>
+		<result column="intervals" property="intervals" jdbcType="INTEGER"/>
+		<result column="jobDesc" property="jobDesc" jdbcType="VARCHAR"/>
+		<result column="jobStatus" property="jobStatus" jdbcType="TINYINT"/>
+		<result column="deleted" property="deleted" jdbcType="TINYINT"/>
+		<result column="createTime" property="createTime" jdbcType="TIMESTAMP"/>
+		<result column="updateTime" property="updateTime" jdbcType="TIMESTAMP"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列，每一个字段都用as取一个别名时为了排序方便，也是为了其他自定义语句方便使用beanMap -->
+	<sql id="fields">
+		id as id,
+		job_name as jobName,
+		job_group as jobGroup,
+		job_type as jobType,
+		destination as destination,
+		job_param_json as jobParamJson,
+		cron_expression as cronExpression,
+		start_time as startTime,
+		end_time as endTime,
+		repeat_count as repeatCount,
+		intervals as intervals,
+		job_desc as jobDesc,
+		job_status as jobStatus,
+		deleted as deleted,
+		create_time as createTime,
+		update_time as updateTime
+	</sql>
+
+	<!-- 多条件组合查询的条件(如：IN LIKE BETWEEN = > < 等等的查询) -->
+	<sql id="condWhere">
+		<where>
+			<if test="id != null">
+				AND id = #{id,jdbcType=BIGINT}
+			</if>
+			<if test="idList != null and idList.size() > 0">
+				AND id IN <foreach collection="idList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+			</if>
+			<if test="jobName != null and jobName != ''">
+				AND job_name = #{jobName,jdbcType=VARCHAR}
+			</if>
+			<if test="jobNameLike != null and jobNameLike != ''">
+				AND job_name LIKE CONCAT('%',#{jobNameLike,jdbcType=VARCHAR},'%')
+			</if>
+			<if test="jobGroup != null and jobGroup != ''">
+				AND job_group = #{jobGroup,jdbcType=VARCHAR}
+			</if>
+			<if test="jobGroupLike != null and jobGroupLike != ''">
+				AND job_group LIKE CONCAT('%',#{jobGroupLike,jdbcType=VARCHAR},'%')
+			</if>
+			<if test="jobType != null">
+				AND job_type = #{jobType,jdbcType=SMALLINT}
+			</if>
+			<if test="jobTypeList != null and jobTypeList.size() > 0">
+				AND job_type IN <foreach collection="jobTypeList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=SMALLINT}</foreach>
+			</if>
+			<if test="destination != null and destination != ''">
+				AND destination = #{destination,jdbcType=VARCHAR}
+			</if>
+			<if test="destinationLike != null and destinationLike != ''">
+				AND destination LIKE CONCAT('%',#{destinationLike,jdbcType=VARCHAR},'%')
+			</if>
+			<if test="jobParamJson != null and jobParamJson != ''">
+				AND job_param_json = #{jobParamJson,jdbcType=VARCHAR}
+			</if>
+			<if test="jobParamJsonLike != null and jobParamJsonLike != ''">
+				AND job_param_json LIKE CONCAT('%',#{jobParamJsonLike,jdbcType=VARCHAR},'%')
+			</if>
+			<if test="cronExpression != null and cronExpression != ''">
+				AND cron_expression = #{cronExpression,jdbcType=VARCHAR}
+			</if>
+			<if test="cronExpressionLike != null and cronExpressionLike != ''">
+				AND cron_expression LIKE CONCAT('%',#{cronExpressionLike,jdbcType=VARCHAR},'%')
+			</if>
+			<if test="startTimeStart != null">
+				AND start_time &gt;= #{startTimeStart,jdbcType=TIMESTAMP}
+			</if>
+			<if test="startTimeEnd != null">
+				AND start_time &lt; #{startTimeEnd,jdbcType=TIMESTAMP}
+			</if>
+			<if test="endTimeStart != null">
+				AND end_time &gt;= #{endTimeStart,jdbcType=TIMESTAMP}
+			</if>
+			<if test="endTimeEnd != null">
+				AND end_time &lt; #{endTimeEnd,jdbcType=TIMESTAMP}
+			</if>
+			<if test="repeatCount != null">
+				AND repeat_count = #{repeatCount,jdbcType=INTEGER}
+			</if>
+			<if test="repeatCountList != null and repeatCountList.size() > 0">
+				AND repeat_count IN <foreach collection="repeatCountList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=INTEGER}</foreach>
+			</if>
+			<if test="intervals != null">
+				AND intervals = #{intervals,jdbcType=INTEGER}
+			</if>
+			<if test="intervalsList != null and intervalsList.size() > 0">
+				AND intervals IN <foreach collection="intervalsList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=INTEGER}</foreach>
+			</if>
+			<if test="jobDesc != null and jobDesc != ''">
+				AND job_desc = #{jobDesc,jdbcType=VARCHAR}
+			</if>
+			<if test="jobDescLike != null and jobDescLike != ''">
+				AND job_desc LIKE CONCAT('%',#{jobDescLike,jdbcType=VARCHAR},'%')
+			</if>
+			<if test="jobStatus != null">
+				AND job_status = #{jobStatus,jdbcType=TINYINT}
+			</if>
+			<if test="jobStatusList != null and jobStatusList.size() > 0">
+				AND job_status IN <foreach collection="jobStatusList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=TINYINT}</foreach>
+			</if>
+			<if test="deleted != null">
+				AND deleted = #{deleted,jdbcType=TINYINT}
+			</if>
+			<if test="deletedList != null and deletedList.size() > 0">
+				AND deleted IN <foreach collection="deletedList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=TINYINT}</foreach>
+			</if>
+			<if test="createTimeStart != null">
+				AND create_time &gt;= #{createTimeStart,jdbcType=TIMESTAMP}
+			</if>
+			<if test="createTimeEnd != null">
+				AND create_time &lt; #{createTimeEnd,jdbcType=TIMESTAMP}
+			</if>
+			<if test="updateTimeStart != null">
+				AND update_time &gt;= #{updateTimeStart,jdbcType=TIMESTAMP}
+			</if>
+			<if test="updateTimeEnd != null">
+				AND update_time &lt; #{updateTimeEnd,jdbcType=TIMESTAMP}
+			</if>
+		</where>
+	</sql>
+
+	<!-- 插入记录 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="com.cyf.center.common.bean.TimerJob">
+		INSERT INTO <include refid="table" /> (
+        	id ,
+        	job_name ,
+        	job_group ,
+        	job_type ,
+        	destination ,
+        	job_param_json ,
+        	cron_expression ,
+        	start_time ,
+        	end_time ,
+        	repeat_count ,
+        	intervals ,
+        	job_desc ,
+        	job_status ,
+        	deleted ,
+        	create_time ,
+        	update_time 
+        ) VALUES (
+        	#{id,jdbcType=BIGINT} ,
+        	#{jobName,jdbcType=VARCHAR} ,
+        	#{jobGroup,jdbcType=VARCHAR} ,
+        	#{jobType,jdbcType=SMALLINT} ,
+        	#{destination,jdbcType=VARCHAR} ,
+        	#{jobParamJson,jdbcType=VARCHAR} ,
+        	#{cronExpression,jdbcType=VARCHAR} ,
+        	#{startTime,jdbcType=TIMESTAMP} ,
+        	#{endTime,jdbcType=TIMESTAMP} ,
+        	#{repeatCount,jdbcType=INTEGER} ,
+        	#{intervals,jdbcType=INTEGER} ,
+        	#{jobDesc,jdbcType=VARCHAR} ,
+        	#{jobStatus,jdbcType=TINYINT} ,
+        	#{deleted,jdbcType=TINYINT} ,
+        	#{createTime,jdbcType=TIMESTAMP} ,
+        	#{updateTime,jdbcType=TIMESTAMP} 
+        )
+	</insert>
+
+	<!-- 批量插入记录 -->
+	<insert id="insertList" useGeneratedKeys="true" keyProperty="id" parameterType="list">
+		INSERT INTO <include refid="table" /> (
+        	id ,
+        	job_name ,
+        	job_group ,
+        	job_type ,
+        	destination ,
+        	job_param_json ,
+        	cron_expression ,
+        	start_time ,
+        	end_time ,
+        	repeat_count ,
+        	intervals ,
+        	job_desc ,
+        	job_status ,
+        	deleted ,
+        	create_time ,
+        	update_time 
+        ) VALUES 
+		<foreach collection="list" item="item" separator=",">
+			(
+			#{item.id,jdbcType=BIGINT},
+			#{item.jobName,jdbcType=VARCHAR},
+			#{item.jobGroup,jdbcType=VARCHAR},
+			#{item.jobType,jdbcType=SMALLINT},
+			#{item.destination,jdbcType=VARCHAR},
+			#{item.jobParamJson,jdbcType=VARCHAR},
+			#{item.cronExpression,jdbcType=VARCHAR},
+			#{item.startTime,jdbcType=TIMESTAMP},
+			#{item.endTime,jdbcType=TIMESTAMP},
+			#{item.repeatCount,jdbcType=INTEGER},
+			#{item.intervals,jdbcType=INTEGER},
+			#{item.jobDesc,jdbcType=VARCHAR},
+			#{item.jobStatus,jdbcType=TINYINT},
+			#{item.deleted,jdbcType=TINYINT},
+			#{item.createTime,jdbcType=TIMESTAMP},
+			#{item.updateTime,jdbcType=TIMESTAMP}
+			)
+		</foreach>
+	</insert>
+
+	<!--动态删除-->
+	 <delete id="deleteBy">
+        DELETE FROM <include refid="table" /> <include refid="condWhere"/>  
+    </delete>
+    
+	<!--更新-->
+	<update id="update" parameterType="com.cyf.center.common.bean.TimerJob">
+        UPDATE <include refid="table" /> SET
+			job_name = #{jobName,jdbcType=VARCHAR},
+			job_group = #{jobGroup,jdbcType=VARCHAR},
+			job_type = #{jobType,jdbcType=SMALLINT},
+			destination = #{destination,jdbcType=VARCHAR},
+			job_param_json = #{jobParamJson,jdbcType=VARCHAR},
+			cron_expression = #{cronExpression,jdbcType=VARCHAR},
+			start_time = #{startTime,jdbcType=TIMESTAMP},
+			end_time = #{endTime,jdbcType=TIMESTAMP},
+			repeat_count = #{repeatCount,jdbcType=INTEGER},
+			intervals = #{intervals,jdbcType=INTEGER},
+			job_desc = #{jobDesc,jdbcType=VARCHAR},
+			job_status = #{jobStatus,jdbcType=TINYINT},
+			deleted = #{deleted,jdbcType=TINYINT},
+			create_time = #{createTime,jdbcType=TIMESTAMP},
+			update_time = #{updateTime,jdbcType=TIMESTAMP}
+         WHERE id = #{id,jdbcType=BIGINT}
+	</update>
+
+	<!-- 只更新值不为null的字段 -->
+	<update id="updateIfNotNull" parameterType="com.cyf.center.common.bean.TimerJob">
+		UPDATE <include refid="table" />
+		<set>
+			<if test="jobName != null">
+				job_name=#{jobName,jdbcType=VARCHAR},
+			</if>
+			<if test="jobGroup != null">
+				job_group=#{jobGroup,jdbcType=VARCHAR},
+			</if>
+			<if test="jobType != null">
+				job_type=#{jobType,jdbcType=SMALLINT},
+			</if>
+			<if test="destination != null">
+				destination=#{destination,jdbcType=VARCHAR},
+			</if>
+			<if test="jobParamJson != null">
+				job_param_json=#{jobParamJson,jdbcType=VARCHAR},
+			</if>
+			<if test="cronExpression != null">
+				cron_expression=#{cronExpression,jdbcType=VARCHAR},
+			</if>
+			<if test="startTime != null">
+				start_time=#{startTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="endTime != null">
+				end_time=#{endTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="repeatCount != null">
+				repeat_count=#{repeatCount,jdbcType=INTEGER},
+			</if>
+			<if test="intervals != null">
+				intervals=#{intervals,jdbcType=INTEGER},
+			</if>
+			<if test="jobDesc != null">
+				job_desc=#{jobDesc,jdbcType=VARCHAR},
+			</if>
+			<if test="jobStatus != null">
+				job_status=#{jobStatus,jdbcType=TINYINT},
+			</if>
+			<if test="deleted != null">
+				deleted=#{deleted,jdbcType=TINYINT},
+			</if>
+			<if test="createTime != null">
+				create_time=#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				update_time=#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		WHERE id = #{id,jdbcType=BIGINT}
+	</update>
+	
+	<!-- 批量更新 -->
+	<update id="updateList" parameterType="list">
+        UPDATE <include refid="table" /> SET
+			job_name = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.jobName,jdbcType=VARCHAR}
+			</foreach>
+			,
+			job_group = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.jobGroup,jdbcType=VARCHAR}
+			</foreach>
+			,
+			job_type = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.jobType,jdbcType=SMALLINT}
+			</foreach>
+			,
+			destination = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.destination,jdbcType=VARCHAR}
+			</foreach>
+			,
+			job_param_json = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.jobParamJson,jdbcType=VARCHAR}
+			</foreach>
+			,
+			cron_expression = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.cronExpression,jdbcType=VARCHAR}
+			</foreach>
+			,
+			start_time = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.startTime,jdbcType=TIMESTAMP}
+			</foreach>
+			,
+			end_time = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.endTime,jdbcType=TIMESTAMP}
+			</foreach>
+			,
+			repeat_count = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.repeatCount,jdbcType=INTEGER}
+			</foreach>
+			,
+			intervals = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.intervals,jdbcType=INTEGER}
+			</foreach>
+			,
+			job_desc = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.jobDesc,jdbcType=VARCHAR}
+			</foreach>
+			,
+			job_status = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.jobStatus,jdbcType=TINYINT}
+			</foreach>
+			,
+			deleted = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.deleted,jdbcType=TINYINT}
+			</foreach>
+			,
+			create_time = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.createTime,jdbcType=TIMESTAMP}
+			</foreach>
+			,
+			update_time = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.updateTime,jdbcType=TIMESTAMP}
+			</foreach>
+			
+		WHERE id IN <foreach collection="list" item="item" index="index" open="(" separator="," close=")">#{item.id,jdbcType=BIGINT}</foreach>
+	</update>
+
+	<!-- 多条件精确查询时计算总记录数 -->
+    <select id="countByCond" resultType="int">
+        SELECT count(*) FROM <include refid="table" /> 
+		<include refid="condWhere"/>
+    </select>
+
+	<!-- 多条件组合查询 -->
+    <select id="listByCond" resultMap="beanMap">
+    	SELECT <include refid="fields" />
+	    FROM <include refid="table" /> 
+		<include refid="condWhere"/>
+		<if test="sortColumns != null">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+	
+	<!-- 取得所有记录，只在表数据量少时使用 -->
+    <select id="listAll" resultMap="beanMap">
+    	SELECT <include refid="fields" />
+	    FROM <include refid="table" /> 
+		<if test="sortColumns != null">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+	<!-- 多条件组合查询，然后由mybatis转成Map之后返回，key字段在调用时指定 -->
+    <select id="mapByCond" resultMap="beanMap">
+    	SELECT <include refid="fields" />
+	    FROM <include refid="table" /> 
+		<include refid="condWhere"/>
+    </select>
+
+	<!-- 根据唯一键查询(如果有的话) -->
+
+
+	<!--按id主键删除-->
+	<delete id="deleteById">
+        DELETE FROM <include refid="table" /> WHERE id = #{id,jdbcType=BIGINT}
+    </delete>
+
+	<!--按多个id主键删除-->
+	<delete id="deleteByIdList">
+        DELETE FROM <include refid="table" /> 
+		WHERE id in <foreach collection="list" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+    </delete>
+    
+	<!-- 根据id查询 -->
+    <select id="getById" resultMap="beanMap">
+		SELECT <include refid="fields" /> 
+		FROM <include refid="table" /> 
+		WHERE id = #{id,jdbcType=BIGINT}  
+	</select>
+
+	<!-- 根据多个id批量查询 -->
+	<select id="listByIdList" resultMap="beanMap">
+		SELECT <include refid="fields" /> 
+		FROM <include refid="table" /> 
+		WHERE id in 
+		<foreach collection="list" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+	</select>
+
+	<!-- 多条件组合查询，然后由mybatis转成以id为key的Map之后返回 -->
+    <select id="mapByIdCond" resultMap="beanMap">
+    	SELECT <include refid="fields" />
+	    FROM <include refid="table" /> 
+		<include refid="condWhere"/>
+    </select>
+</mapper>
+

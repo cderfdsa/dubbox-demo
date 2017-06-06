@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cyf.base.user.bean.User">
+	<sql id="table"> user </sql>
+
+	<!-- 用于返回的bean对象 -->
+	<resultMap id="beanMap" type="com.cyf.base.user.bean.User">
+		<result column="id" property="id" jdbcType="BIGINT"/>
+		<result column="phone" property="phone" jdbcType="VARCHAR"/>
+		<result column="email" property="email" jdbcType="VARCHAR"/>
+		<result column="usercode" property="usercode" jdbcType="VARCHAR"/>
+		<result column="password" property="password" jdbcType="VARCHAR"/>
+		<result column="username" property="username" jdbcType="VARCHAR"/>
+		<result column="gender" property="gender" jdbcType="TINYINT"/>
+		<result column="status" property="status" jdbcType="TINYINT"/>
+		<result column="deleted" property="deleted" jdbcType="TINYINT"/>
+		<result column="createTime" property="createTime" jdbcType="TIMESTAMP"/>
+		<result column="updateTime" property="updateTime" jdbcType="TIMESTAMP"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列，每一个字段都用as取一个别名时为了排序方便，也是为了其他自定义语句方便使用beanMap -->
+	<sql id="fields">
+		id as id,
+		phone as phone,
+		email as email,
+		usercode as usercode,
+		password as password,
+		username as username,
+		gender as gender,
+		status as status,
+		deleted as deleted,
+		create_time as createTime,
+		update_time as updateTime
+	</sql>
+
+	<!-- 多条件组合查询的条件(如：IN LIKE BETWEEN = > < 等等的查询) -->
+	<sql id="condWhere">
+		<where>
+			<if test="id != null">
+				AND id = #{id,jdbcType=BIGINT}
+			</if>
+			<if test="idList != null and idList.size() > 0">
+				AND id IN <foreach collection="idList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+			</if>
+			<if test="phone != null and phone != ''">
+				AND phone = #{phone,jdbcType=VARCHAR}
+			</if>
+			<if test="phoneLike != null and phoneLike != ''">
+				AND phone LIKE CONCAT('%',#{phoneLike,jdbcType=VARCHAR},'%')
+			</if>
+			<if test="email != null and email != ''">
+				AND email = #{email,jdbcType=VARCHAR}
+			</if>
+			<if test="emailLike != null and emailLike != ''">
+				AND email LIKE CONCAT('%',#{emailLike,jdbcType=VARCHAR},'%')
+			</if>
+			<if test="usercode != null and usercode != ''">
+				AND usercode = #{usercode,jdbcType=VARCHAR}
+			</if>
+			<if test="usercodeLike != null and usercodeLike != ''">
+				AND usercode LIKE CONCAT('%',#{usercodeLike,jdbcType=VARCHAR},'%')
+			</if>
+			<if test="password != null and password != ''">
+				AND password = #{password,jdbcType=VARCHAR}
+			</if>
+			<if test="passwordLike != null and passwordLike != ''">
+				AND password LIKE CONCAT('%',#{passwordLike,jdbcType=VARCHAR},'%')
+			</if>
+			<if test="username != null and username != ''">
+				AND username = #{username,jdbcType=VARCHAR}
+			</if>
+			<if test="usernameLike != null and usernameLike != ''">
+				AND username LIKE CONCAT('%',#{usernameLike,jdbcType=VARCHAR},'%')
+			</if>
+			<if test="gender != null">
+				AND gender = #{gender,jdbcType=TINYINT}
+			</if>
+			<if test="genderList != null and genderList.size() > 0">
+				AND gender IN <foreach collection="genderList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=TINYINT}</foreach>
+			</if>
+			<if test="status != null">
+				AND status = #{status,jdbcType=TINYINT}
+			</if>
+			<if test="statusList != null and statusList.size() > 0">
+				AND status IN <foreach collection="statusList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=TINYINT}</foreach>
+			</if>
+			<if test="deleted != null">
+				AND deleted = #{deleted,jdbcType=TINYINT}
+			</if>
+			<if test="deletedList != null and deletedList.size() > 0">
+				AND deleted IN <foreach collection="deletedList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=TINYINT}</foreach>
+			</if>
+			<if test="createTimeStart != null">
+				AND create_time &gt;= #{createTimeStart,jdbcType=TIMESTAMP}
+			</if>
+			<if test="createTimeEnd != null">
+				AND create_time &lt; #{createTimeEnd,jdbcType=TIMESTAMP}
+			</if>
+			<if test="updateTimeStart != null">
+				AND update_time &gt;= #{updateTimeStart,jdbcType=TIMESTAMP}
+			</if>
+			<if test="updateTimeEnd != null">
+				AND update_time &lt; #{updateTimeEnd,jdbcType=TIMESTAMP}
+			</if>
+		</where>
+	</sql>
+
+	<!-- 插入记录 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="com.cyf.base.user.bean.User">
+		INSERT INTO <include refid="table" /> (
+        	id ,
+        	phone ,
+        	email ,
+        	usercode ,
+        	password ,
+        	username ,
+        	gender ,
+        	status ,
+        	deleted ,
+        	create_time ,
+        	update_time 
+        ) VALUES (
+        	#{id,jdbcType=BIGINT} ,
+        	#{phone,jdbcType=VARCHAR} ,
+        	#{email,jdbcType=VARCHAR} ,
+        	#{usercode,jdbcType=VARCHAR} ,
+        	#{password,jdbcType=VARCHAR} ,
+        	#{username,jdbcType=VARCHAR} ,
+        	#{gender,jdbcType=TINYINT} ,
+        	#{status,jdbcType=TINYINT} ,
+        	#{deleted,jdbcType=TINYINT} ,
+        	#{createTime,jdbcType=TIMESTAMP} ,
+        	#{updateTime,jdbcType=TIMESTAMP} 
+        )
+	</insert>
+
+	<!-- 批量插入记录 -->
+	<insert id="insertList" useGeneratedKeys="true" keyProperty="id" parameterType="list">
+		INSERT INTO <include refid="table" /> (
+        	id ,
+        	phone ,
+        	email ,
+        	usercode ,
+        	password ,
+        	username ,
+        	gender ,
+        	status ,
+        	deleted ,
+        	create_time ,
+        	update_time 
+        ) VALUES 
+		<foreach collection="list" item="item" separator=",">
+			(
+			#{item.id,jdbcType=BIGINT},
+			#{item.phone,jdbcType=VARCHAR},
+			#{item.email,jdbcType=VARCHAR},
+			#{item.usercode,jdbcType=VARCHAR},
+			#{item.password,jdbcType=VARCHAR},
+			#{item.username,jdbcType=VARCHAR},
+			#{item.gender,jdbcType=TINYINT},
+			#{item.status,jdbcType=TINYINT},
+			#{item.deleted,jdbcType=TINYINT},
+			#{item.createTime,jdbcType=TIMESTAMP},
+			#{item.updateTime,jdbcType=TIMESTAMP}
+			)
+		</foreach>
+	</insert>
+
+	<!--动态删除-->
+	 <delete id="deleteBy">
+        DELETE FROM <include refid="table" /> <include refid="condWhere"/>  
+    </delete>
+    
+	<!--更新-->
+	<update id="update" parameterType="com.cyf.base.user.bean.User">
+        UPDATE <include refid="table" /> SET
+			phone = #{phone,jdbcType=VARCHAR},
+			email = #{email,jdbcType=VARCHAR},
+			usercode = #{usercode,jdbcType=VARCHAR},
+			password = #{password,jdbcType=VARCHAR},
+			username = #{username,jdbcType=VARCHAR},
+			gender = #{gender,jdbcType=TINYINT},
+			status = #{status,jdbcType=TINYINT},
+			deleted = #{deleted,jdbcType=TINYINT},
+			create_time = #{createTime,jdbcType=TIMESTAMP},
+			update_time = #{updateTime,jdbcType=TIMESTAMP}
+         WHERE id = #{id,jdbcType=BIGINT}
+	</update>
+
+	<!-- 只更新值不为null的字段 -->
+	<update id="updateIfNotNull" parameterType="com.cyf.base.user.bean.User">
+		UPDATE <include refid="table" />
+		<set>
+			<if test="phone != null">
+				phone=#{phone,jdbcType=VARCHAR},
+			</if>
+			<if test="email != null">
+				email=#{email,jdbcType=VARCHAR},
+			</if>
+			<if test="usercode != null">
+				usercode=#{usercode,jdbcType=VARCHAR},
+			</if>
+			<if test="password != null">
+				password=#{password,jdbcType=VARCHAR},
+			</if>
+			<if test="username != null">
+				username=#{username,jdbcType=VARCHAR},
+			</if>
+			<if test="gender != null">
+				gender=#{gender,jdbcType=TINYINT},
+			</if>
+			<if test="status != null">
+				status=#{status,jdbcType=TINYINT},
+			</if>
+			<if test="deleted != null">
+				deleted=#{deleted,jdbcType=TINYINT},
+			</if>
+			<if test="createTime != null">
+				create_time=#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				update_time=#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		WHERE id = #{id,jdbcType=BIGINT}
+	</update>
+	
+	<!-- 批量更新 -->
+	<update id="updateList" parameterType="list">
+        UPDATE <include refid="table" /> SET
+			phone = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.phone,jdbcType=VARCHAR}
+			</foreach>
+			,
+			email = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.email,jdbcType=VARCHAR}
+			</foreach>
+			,
+			usercode = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.usercode,jdbcType=VARCHAR}
+			</foreach>
+			,
+			password = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.password,jdbcType=VARCHAR}
+			</foreach>
+			,
+			username = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.username,jdbcType=VARCHAR}
+			</foreach>
+			,
+			gender = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.gender,jdbcType=TINYINT}
+			</foreach>
+			,
+			status = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.status,jdbcType=TINYINT}
+			</foreach>
+			,
+			deleted = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.deleted,jdbcType=TINYINT}
+			</foreach>
+			,
+			create_time = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.createTime,jdbcType=TIMESTAMP}
+			</foreach>
+			,
+			update_time = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.updateTime,jdbcType=TIMESTAMP}
+			</foreach>
+			
+		WHERE id IN <foreach collection="list" item="item" index="index" open="(" separator="," close=")">#{item.id,jdbcType=BIGINT}</foreach>
+	</update>
+
+	<!-- 多条件精确查询时计算总记录数 -->
+    <select id="countByCond" resultType="int">
+        SELECT count(*) FROM <include refid="table" /> 
+		<include refid="condWhere"/>
+    </select>
+
+	<!-- 多条件组合查询 -->
+    <select id="listByCond" resultMap="beanMap">
+    	SELECT <include refid="fields" />
+	    FROM <include refid="table" /> 
+		<include refid="condWhere"/>
+		<if test="sortColumns != null">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+	
+	<!-- 取得所有记录，只在表数据量少时使用 -->
+    <select id="listAll" resultMap="beanMap">
+    	SELECT <include refid="fields" />
+	    FROM <include refid="table" /> 
+		<if test="sortColumns != null">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+	<!-- 多条件组合查询，然后由mybatis转成Map之后返回，key字段在调用时指定 -->
+    <select id="mapByCond" resultMap="beanMap">
+    	SELECT <include refid="fields" />
+	    FROM <include refid="table" /> 
+		<include refid="condWhere"/>
+    </select>
+
+	<!-- 根据唯一键查询(如果有的话) -->
+	<select id="getByPhone" resultMap="beanMap" parameterType="java.lang.String">
+		SELECT <include refid="fields"/>
+		FROM <include refid="table" /> where phone = #{phone,jdbcType=VARCHAR}
+	</select>
+	<select id="getByEmail" resultMap="beanMap" parameterType="java.lang.String">
+		SELECT <include refid="fields"/>
+		FROM <include refid="table" /> where email = #{email,jdbcType=VARCHAR}
+	</select>
+	<select id="getByUsercode" resultMap="beanMap" parameterType="java.lang.String">
+		SELECT <include refid="fields"/>
+		FROM <include refid="table" /> where usercode = #{usercode,jdbcType=VARCHAR}
+	</select>
+
+
+	<!--按id主键删除-->
+	<delete id="deleteById">
+        DELETE FROM <include refid="table" /> WHERE id = #{id,jdbcType=BIGINT}
+    </delete>
+
+	<!--按多个id主键删除-->
+	<delete id="deleteByIdList">
+        DELETE FROM <include refid="table" /> 
+		WHERE id in <foreach collection="list" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+    </delete>
+    
+	<!-- 根据id查询 -->
+    <select id="getById" resultMap="beanMap">
+		SELECT <include refid="fields" /> 
+		FROM <include refid="table" /> 
+		WHERE id = #{id,jdbcType=BIGINT}  
+	</select>
+
+	<!-- 根据多个id批量查询 -->
+	<select id="listByIdList" resultMap="beanMap">
+		SELECT <include refid="fields" /> 
+		FROM <include refid="table" /> 
+		WHERE id in 
+		<foreach collection="list" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+	</select>
+
+	<!-- 多条件组合查询，然后由mybatis转成以id为key的Map之后返回 -->
+    <select id="mapByIdCond" resultMap="beanMap">
+    	SELECT <include refid="fields" />
+	    FROM <include refid="table" /> 
+		<include refid="condWhere"/>
+    </select>
+</mapper>
+

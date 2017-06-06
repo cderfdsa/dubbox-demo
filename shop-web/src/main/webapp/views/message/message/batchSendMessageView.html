@@ -1,0 +1,97 @@
+<script>
+    var queueContainer = new Vue({
+        el:"#batchSendQueueAndTopicContainer",
+        methods:{
+            submit: function(){
+                var formId = "#batchSendQueueAndTopicForm";
+                BJUI.ajax('ajaxform', {
+                    url: $(formId).prop("action"),
+                    form: $.CurrentNavtab.find(formId),
+                    validate:true,
+                    loadingmask: true,
+                    okCallback: function(json, options) {
+                        if(json.statusCode == BJUI.statusCode.ok){
+                            BJUI.alertmsg("ok", "批量发送消息成功，请到ActiveMQ管理界面查看")
+                        }else{
+                            BJUI.alertmsg("error", json.message);
+                        }
+                    }
+                });
+            }
+        }
+    });
+</script>
+
+<style>
+    .centerElement{
+        margin: 0 auto;
+        text-align: center;
+    }
+</style>
+
+<div class="bjui-pageHeader" id="messageManageHeader">
+    <a href="${amqUrl}" class="btn btn-green" target="_blank">查看消息</a>
+    <span><--- 账号：admin &nbsp;&nbsp;密码：admin</span>
+</div>
+
+<div class="bjui-pageContent" id="batchSendQueueAndTopicContainer">
+    <div style="padding-bottom: 10px;">
+        <br>
+        <form action="/message/message/batchSendMessageSave" id="batchSendQueueAndTopicForm" data-toggle="validate" data-alertmsg="false">
+            <table class=" table-striped table-condensed table-bordered centerElement">
+                <thead>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><label >queue名称：</label></td>
+                    <td><input class="form-control" type="text" name="queueName" value="test.batch.queue" readonly="readonly" data-rule="required"></td>
+                </tr>
+                <tr>
+                    <td><label >消息内容：</label></td>
+                    <td><input class="form-control" name="queuePayload" type="text" data-rule="required"></td>
+                </tr>
+                <tr>
+                    <td><label >queue消息数量：</label></td>
+                    <td align="left">
+                        <select name="queueNumber" data-toggle="selectpicker" data-rule="icheck">
+                            <option value="1">1</option>
+                            <option value="10">10</option>
+                            <option value="100">100</option>
+                            <option value="1000">1000</option>
+                            <option value="3000">3000</option>
+                            <option value="5000">5000</option>
+                        </select>
+                    </td>
+                </tr>
+
+                <tr height="30"><td colspan="2"></td></tr>
+
+                <tr>
+                    <td><label >topic名称：</label></td>
+                    <td><input class="form-control" name="topicName" value="test.batch.topic" type="text" readonly="readonly" data-rule="required"></td>
+                </tr>
+                <tr>
+                    <td><label >消息内容：</label></td>
+                    <td><input class="form-control" name="topicPayload" type="text" data-rule="required"></td>
+                </tr>
+                <tr>
+                    <td><label >topic消息数量：</label></td>
+                    <td align="left">
+                        <select name="topicNumber" data-toggle="selectpicker" data-rule="icheck">
+                            <option value="1">1</option>
+                            <option value="10">10</option>
+                            <option value="100">100</option>
+                            <option value="1000">1000</option>
+                            <option value="3000">3000</option>
+                            <option value="5000">5000</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><button type="button" @click="submit()" class="btn-blue" data-icon="save">确定</button></td>
+                </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>

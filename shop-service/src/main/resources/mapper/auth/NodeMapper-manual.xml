@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 存放手写的sql -->
+<mapper namespace="com.cyf.shop.auth.bean.Node">
+    <!-- 取得当前节点下的所有子节点 -->
+    <select id="listActiveChildNode" resultMap="beanMap" parameterType="long">
+        SELECT <include refid="fields" />
+        FROM <include refid="table" />
+        WHERE status = 1 and FIND_IN_SET(#{nodeId,jdbcType=BIGINT},ancestors_id)
+    </select>
+</mapper>

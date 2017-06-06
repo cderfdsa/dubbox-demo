@@ -1,0 +1,186 @@
+<script>
+    var timerJobList = ${timerJobList};
+
+    var timerJobListTable = new Vue({
+        el:"#timerJobListTable",
+        data:{
+            timerJobList: timerJobList,
+        },
+        methods:{
+            pauseTimerJob: function (jobGroup, jobName) {//暂停任务
+                var uri = "/message/timer/pauseTimerJob?jobGroup="+jobGroup+"&jobName="+jobName;
+                BJUI.alertmsg("confirm", "确定暂停当前任务吗？", {
+                    okCall: function() {
+                        BJUI.ajax('doajax', {
+                            url: uri,
+                            loadingmask: true,
+                            okCallback: function(json, options) {
+                                if(json.statusCode == BJUI.statusCode.ok){
+                                    BJUI.alertmsg("ok", "暂停任务成功");
+                                    freshNavtab();
+                                }else{
+                                    BJUI.alertmsg("error", json.message);
+                                }
+                            }
+                        });
+                    }
+                });
+            },
+            tryScheduleJob: function(jobGroup, jobName){
+                var uri = "/message/timer/tryScheduleJob?jobGroup="+jobGroup+"&jobName="+jobName;
+                BJUI.alertmsg("confirm", "确定添加当前任务到定时计划中吗？", {
+                    okCall: function() {
+                        BJUI.ajax('doajax', {
+                            url: uri,
+                            loadingmask: true,
+                            okCallback: function(json, options) {
+                                if(json.statusCode == BJUI.statusCode.ok){
+                                    BJUI.alertmsg("ok", "添加定时计划成功");
+                                    freshNavtab();
+                                }else{
+                                    BJUI.alertmsg("error", json.message);
+                                }
+                            }
+                        });
+                    }
+                });
+            },
+            resumeTimerJob: function (jobGroup, jobName) {//恢复被暂停的任务
+                var uri = "/message/timer/resumeTimerJob?jobGroup="+jobGroup+"&jobName="+jobName;
+                BJUI.alertmsg("confirm", "确定恢复当前任务吗？", {
+                    okCall: function() {
+                        BJUI.ajax('doajax', {
+                            url: uri,
+                            loadingmask: true,
+                            okCallback: function(json, options) {
+                                if(json.statusCode == BJUI.statusCode.ok){
+                                    BJUI.alertmsg("ok", "恢复任务成功");
+                                    freshNavtab();
+                                }else{
+                                    BJUI.alertmsg("error", json.message);
+                                }
+                            }
+                        });
+                    }
+                });
+            },
+            executeOnceNow: function(jobGroup, jobName){
+                var uri = "/message/timer/executeOnceNow?jobGroup="+jobGroup+"&jobName="+jobName;
+                BJUI.alertmsg("confirm", "确定立即执行一次当前任务吗？", {
+                    okCall: function() {
+                        BJUI.ajax('doajax', {
+                            url: uri,
+                            loadingmask: true,
+                            okCallback: function(json, options) {
+                                if(json.statusCode == BJUI.statusCode.ok){
+                                    BJUI.alertmsg("ok", "执行任务成功");
+                                    freshNavtab();
+                                }else{
+                                    BJUI.alertmsg("error", json.message);
+                                }
+                            }
+                        });
+                    }
+                });
+            },
+            deleteTimerJob: function (jobGroup, jobName){//删除定时任务
+                var uri = "/message/timer/deleteTimerJob?jobGroup="+jobGroup+"&jobName="+jobName;
+                BJUI.alertmsg("confirm", "确定删除当前任务吗？", {
+                    okCall: function() {
+                        BJUI.ajax('doajax', {
+                            url: uri,
+                            loadingmask: true,
+                            okCallback: function(json, options) {
+                                if(json.statusCode == BJUI.statusCode.ok){
+                                    BJUI.alertmsg("ok", "删除任务成功");
+                                    freshNavtab();
+                                }else{
+                                    BJUI.alertmsg("error", json.message);
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        },
+    });
+
+    function freshNavtab(){
+        BJUI.navtab("refresh");
+    }
+</script>
+
+<div class="bjui-pageHeader" id="timerJobListHeader">
+    <a href="/message/timer/addTimerJobView" class="btn btn-green" data-toggle="navtab" data-id="addTimerJobView" data-title="新建定时任务"
+       data-mask="true" data-icon="plus" v-if="access('/message/timer/addTimerJobView')">新建任务</a>&nbsp;
+
+    <a href="http://127.0.0.1:8161/admin/queues.jsp" class="btn btn-green" target="_blank">查看任务的消息</a>
+    <span><--- 账号：admin &nbsp;&nbsp;密码：admin</span>
+</div>
+
+<div class="bjui-pageContent tableContent" >
+    <table class="table table-bordered table-hover" id="timerJobListTable">
+        <thead>
+        <tr>
+            <th align="center">序号</th>
+            <th align="center">任务分组</th>
+            <th align="center">任务名称</th>
+            <th align="center">任务类型</th>
+            <th align="center">消息目的地</th>
+            <th align="center">cron表达式</th>
+            <th align="center">开始时间</th>
+            <th align="center">结束时间</th>
+            <th align="center">重复次数</th>
+            <th align="center">时间间隔(秒)</th>
+            <th align="center">状态</th>
+            <th align="center">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="(vo, index) in timerJobList">
+            <td title="序号">{{index+1}}</td>
+            <td align="center" title="任务分组">{{vo.jobGroup}}</td>
+            <td align="center" title="任务名称">{{vo.jobName}}</td>
+            <td align="center" title="任务类型">
+                <span style="" v-if="vo.jobType==1">cron任务</span>
+                <span style="" v-else-if="vo.jobType==2">常规重复任务</span>
+            </td>
+            <td align="center" title="消息目的地">{{vo.destination}}</td>
+            <td align="center" title="cron表达式">{{vo.cronExpression}}</td>
+            <td align="center" title="开始时间">{{vo.startTime}}</td>
+            <td align="center" title="结束时间">{{vo.endTime}}</td>
+            <td align="center" title="重复次数">{{vo.repeatCount}}</td>
+            <td align="center" title="时间间隔">{{vo.intervals}}</td>
+            <td align="center" title="状态">
+                <span style="color:green;" v-if="vo.jobStatus==1">有效</span>
+                <span style="" v-else-if="vo.jobStatus==2">暂停</span>
+                <span style="color: #7e00ff" v-else-if="vo.jobStatus==3">缓停</span>
+            </td>
+            <td align="center">
+                <a v-bind:href="'/message/timer/timerJobDetail?jobGroup='+vo.jobGroup+'&jobName='+vo.jobName" data-toggle="dialog"
+                   data-options="{id:'timerJobDetail',title:'定时任务详情',height:550}"
+                   class="btn btn-blue" v-if="access('/message/timer/timerJobDetail')">详情
+                </a>
+
+                <a @click="tryScheduleJob(vo.jobGroup, vo.jobName)" class="btn btn-blue"
+                   v-if="vo.jobStatus == 3 && access('/message/timer/tryScheduleJob')">加到计划中
+                </a>
+
+                <a @click="pauseTimerJob(vo.jobGroup, vo.jobName)" class="btn btn-blue"
+                   v-if="vo.jobStatus == 1 && access('/message/timer/pauseTimerJob')">暂停
+                </a>
+
+                <a @click="resumeTimerJob(vo.jobGroup, vo.jobName)" class="btn btn-green"
+                   v-if="vo.jobStatus == 2 && access('/message/timer/resumeTimerJob')">恢复
+                </a>
+
+                <a @click="executeOnceNow(vo.jobGroup, vo.jobName)" class="btn btn-blue"
+                   v-if="vo.jobStatus != 2 && access('/message/timer/executeOnceNow')">执行一次
+                </a>
+
+                <a @click="deleteTimerJob(vo.jobGroup, vo.jobName)" class="btn btn-red" v-if="access('/message/timer/deleteTimerJob')">删除</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>

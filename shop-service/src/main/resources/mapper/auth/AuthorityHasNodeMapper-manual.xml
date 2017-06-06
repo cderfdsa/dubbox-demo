@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 存放手写的sql -->
+<mapper namespace="com.cyf.shop.auth.bean.AuthorityHasNode">
+    <select id="listAuthAssignNode" resultType="com.cyf.shop.auth.vo.AuthAssignNodeVo">
+        SELECT
+        a.`id` as nodeId,
+        a.`name` as name,
+        a.`parent_id` as parentId,
+        a.`exclusive` as exclusive,
+        GROUP_CONCAT(DISTINCT b.`fk_authority_id`) as assignedAuthIds
+        FROM
+        auth_node a LEFT JOIN auth_authority_has_node b
+        ON a.`id` = b.`fk_node_id` and a.status=1 GROUP BY a.`id`
+    </select>
+
+    <select id="listAuthorityHasNodeByNodeId" resultType="com.cyf.shop.auth.bean.AuthorityHasNode">
+        SELECT
+        a.`id` as id,
+        a.`fk_authority_id` as fkAuthorityId,
+        a.`fk_node_id` as fkNodeId,
+        a.`create_time` as createTime,
+        a.`update_time` as updateTime,
+        b.name as nodeName,
+        c.name as authName
+        FROM
+        auth_authority_has_node a JOIN auth_node b JOIN auth_authority c
+        ON a.`fk_node_id` = #{fkNodeId} and a.`fk_node_id` = b.`id` and a.`fk_authority_id` = c.`id` and b.`status` = 1 and c.`status` = 1
+    </select>
+</mapper>

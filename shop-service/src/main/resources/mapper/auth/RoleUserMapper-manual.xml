@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 存放手写的sql -->
+<mapper namespace="com.cyf.shop.auth.bean.RoleUser">
+    <select id="listRoleUserByUserId" resultType="com.cyf.shop.auth.bean.RoleUser">
+        SELECT
+        a.`id` as id,
+        a.`fk_role_id` as fkRoleId,
+        a.`fk_user_id` as fkUserId,
+        a.`create_time` as createTime,
+        a.`update_time` as updateTime,
+        b.name as roleName
+        FROM
+        auth_role_user a JOIN auth_role b ON a.`fk_user_id` = #{fkUserId} and a.`fk_role_id` = b.`id` and b.`status` = 1
+    </select>
+</mapper>

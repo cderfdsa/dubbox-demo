@@ -1,0 +1,78 @@
+<script type="text/javascript">
+    var role = ${role};
+    var roleUserList = ${roleUserList};
+    var userList = ${userList};
+    var selected = [];
+    var bindRoleUserSaveForm;
+
+    $(function () {
+        initUserIdChecked();
+
+        bindRoleUserSaveForm = new Vue({
+            el: '#bindRoleUserSaveForm',
+            data: {
+                role: role,
+                roleUserList: roleUserList,
+                userList: userList,
+                selected:selected,
+            },
+            methods: {
+                isBind: function(userId){
+                    for(var i=0; i<roleUserList.length; i++){
+                        if(roleUserList[i].fkUserId == userId){
+                            return true;
+                        }
+                    }
+                    return false;
+                },
+            }
+        });
+    });
+    function initUserIdChecked(){
+        for(var i=0; i<roleUserList.length; i++){
+            selected.push(roleUserList[i].fkUserId);
+        }
+    }
+</script>
+
+<div class="bjui-pageContent">
+    <form action="/auth/role/assignUserSave" id="bindRoleUserSaveForm" data-toggle="validate" data-alertmsg="false">
+        <input type="hidden" name="roleId" v-bind:value="role.id">
+        <input type="hidden" name="userIdStr" v-model="selected">
+
+        <div>
+            角色名称：{{role.name}}
+        </div>
+
+        <table class="table table-bordered table-hover">
+            <thead>
+            <tr>
+                <th style="text-align: center;">
+                    选择
+                </th>
+                <th>用户姓名</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr v-for="(vo, index) in userList">
+                <td style="text-align: center;">
+                    <input type="checkbox" v-bind:value="vo.id" v-model="selected">
+                </td>
+                <td>{{vo.username}}</td>
+            </tr>
+            </tbody>
+        </table>
+    </form>
+</div>
+
+<div class="bjui-pageFooter">
+    <ul>
+        <li>
+            <button type="button" class="btn-close" data-icon="close">取消</button>
+        </li>
+        <li>
+            <button type="submit" class="btn-blue" data-icon="save">确定</button>
+        </li>
+    </ul>
+</div>

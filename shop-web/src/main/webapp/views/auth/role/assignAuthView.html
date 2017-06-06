@@ -1,0 +1,94 @@
+<script type="text/javascript">
+    var role = ${role};
+    var assignVoList = ${assignVoList};
+    var authIdJsonStr = [];
+    initRoleAssignAuth();
+
+    var assignAuthSaveForm = new Vue({
+        el:"#assignAuthSaveForm",
+        data:{
+            role: role,
+            assignVoList: assignVoList,
+            authIdJsonStr:authIdJsonStr,
+        },
+        methods:{
+            isNoCheck: function(vo){
+                if(vo.checkLevel==1 || vo.checkLevel==2){
+                    return true;
+                }else{
+                    return false;
+                }
+            },
+        },
+    });
+
+    function initRoleAssignAuth(){
+        for(var i=0; i<assignVoList.length; i++){
+            authIdJsonStr.push(assignVoList[i].authId);
+        }
+    }
+
+    function ZtreeClick() {
+        var zTree = $.fn.zTree.getZTreeObj("roleAssignAuthZtree");
+        var checkedNodes = zTree.getCheckedNodes();
+        var length = checkedNodes.length;
+
+        assignAuthSaveForm.authIdJsonStr = [];
+        for (var i = 0; i < length; i++) {
+            var id = checkedNodes[i].id;
+            assignAuthSaveForm.authIdJsonStr.push(id);
+        }
+    }
+</script>
+
+<div class="bjui-pageContent">
+    <form action="/auth/role/assignAuthSave" id="assignAuthSaveForm" data-toggle="validate" data-alertmsg="false">
+        <input type="hidden" name="roleId" v-bind:value="role.id">
+        <input type="hidden" name="authIdJsonStr" id="authIdJsonStr" v-bind:value="authIdJsonStr">
+        <div style="margin:auto;">
+            <ul style="width: 100%;">
+                <li>
+                    <span class="t">角色名称:</span>
+                    <span class="info">{{role.name}}</span>
+                </li>
+                <li>
+                    <span class="t">角色类型:</span>
+                    <span v-if="role.type==1">普通角色</span>
+                    <span v-else-if="role.type==2">超级管理员</span>
+                </li>
+            </ul>
+        </div>
+
+        <div style="margin-top: 30px;">
+            <div>分配节点</div>
+            <div style="margin:auto auto auto 28%;">
+                <ul id="roleAssignAuthZtree" class="ztree" data-toggle="ztree" data-options="{
+                        expandAll: true,
+                        onClick: 'ZtreeClick',
+                        onCheck: 'ZtreeClick',
+                        setting:{
+                            check:{
+                                enable: true,
+                                chkStyle: 'checkbox',
+                                chkboxType: { 'Y': 'ps', 'N': 's' }
+                            }
+                        }
+                    }">
+                    <li v-for="vo in assignVoList" v-bind:data-id="vo.authId" v-bind:data-pid="vo.parentId" v-bind:data-nocheck="isNoCheck(vo)"
+                        v-bind:data-checked="vo.isAssignedRoleId" data-faicon-close="cab">{{vo.name}}</li>
+                </ul>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="bjui-pageFooter">
+    <ul>
+        <li>
+            <button type="button" class="btn-close" data-icon="close">取消</button>
+        </li>
+        <li>
+            <button type="submit" class="btn-blue" data-icon="save">确定</button>
+        </li>
+    </ul>
+</div>

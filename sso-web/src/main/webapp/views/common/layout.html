@@ -1,0 +1,33 @@
+<#macro layout>
+    <!DOCTYPE html>
+    <html lang="zh_CN">
+        <!-- 引入html头部,加载各种JS/CSS文件 -->
+        <head>
+            <#include "common/head.html">
+
+            <!-- 初始化 -->
+            <script>
+//                $(function($) {
+//                    $(".validForm").Validform();
+//                });
+            </script>
+        </head>
+
+
+        <body>
+            <div class="container">
+                <!-- 引入头部 -->
+                <#include "common/header.html">
+
+                <!-- 引入左侧栏 -->
+                <#include "common/sidebar.html">
+
+                <!-- 在这里嵌入不同子页面的内容 -->
+                <#nested>
+
+                <!-- 引入底部 -->
+                <#include "common/footer.html">
+            </div>
+        </body>
+    </html>
+</#macro>

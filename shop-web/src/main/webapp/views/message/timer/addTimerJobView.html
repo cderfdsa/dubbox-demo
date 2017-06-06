@@ -1,0 +1,698 @@
+<script>
+    var weekSelected = [];
+    var dateSelected = [];
+    var dateArray = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+
+    var queueContainer = new Vue({
+        el:"#addTimerJobContainer",
+        data:{
+            weekSelected: weekSelected,
+            dateSelected: dateSelected,
+            dateArray: dateArray,
+        },
+        methods:{
+            selectWeek: function(){
+                alert(weekSelected);
+            },
+            selectDate: function(){
+
+            },
+            submit: function(formId){
+                formId = "#"+formId;
+                BJUI.ajax('ajaxform', {
+                    url: $(formId).prop("action"),
+                    form: $.CurrentNavtab.find(formId),
+                    validate:true,
+                    loadingmask: true,
+                    okCallback: function(json, options) {
+                        if(json.statusCode == BJUI.statusCode.ok){
+                            BJUI.alertmsg("ok", "定时任务创建成功，请到ActiveMQ管理界面查看")
+                        }else{
+                            BJUI.alertmsg("error", json.message);
+                        }
+                    }
+                });
+            }
+        }
+    });
+</script>
+
+<div class="bjui-pageHeader" id="timerMessageManageHeader">
+
+</div>
+
+<div class="bjui-pageContent" id="addTimerJobContainer">
+    <div class="simpleRepeatJob" style="float:left;margin-left: 100px">
+        <div class="centerText" style="padding-top:10px; padding-bottom: 10px; color: red">↓↓↓↓↓以下是常规重复性类型的定时任务↓↓↓↓↓</div>
+        <div style="padding-bottom: 10px;">
+            <br>
+            <form action="/message/timer/addTimerJobSave" id="addTimerJobForm_1" data-toggle="validate" data-alertmsg="false">
+                <input type="hidden" name="jobType" value="onceSimpleJob">
+                <table class=" table-striped table-condensed table-bordered ">
+                    <thead>
+                    <tr>
+                        <th colspan="2" style="text-align: center">一次性任务</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td><label >开始时间：</label></td>
+                        <td><input class="form-control" name="startTime" type="text" data-toggle="datepicker" data-pattern="yyyy-MM-dd HH:mm:ss"
+                                   placeholder="选择日期" data-rule="required">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label >任务分组：</label></td>
+                        <td><input class="form-control" name="jobGroup" type="text" data-rule="required;charOnly"
+                                   data-rule-charOnly="[/^[a-zA-Z][a-zA-Z0-9_.]+$/, '只能输入以字母开头的字母、数字、下划线、点']"></td>
+                    </tr>
+                    <tr>
+                        <td><label >任务名称：</label></td>
+                        <td><input class="form-control" name="jobName" type="text" data-rule="required;charOnly"
+                                   data-rule-charOnly="[/^[a-zA-Z][a-zA-Z0-9_.]+$/, '只能输入以字母开头的字母、数字、下划线、点']"></td>
+                    </tr>
+                    <tr>
+                        <td><label >任务消息目的地：</label></td>
+                        <td><input class="form-control" name="destination" type="text" placeholder="默认是任务分组+任务名称" data-rule="charOnly"
+                                   data-rule-charOnly="[/^[a-zA-Z][a-zA-Z0-9_.]+$/, '只能输入以字母开头的字母、数字、下划线、点']"></td>
+                    </tr>
+                    <tr>
+                        <td><label >参数：</label></td>
+                        <td><input class="form-control" name="jobParam" type="text"></td>
+                    </tr>
+                    <tr>
+                        <td><label >描述：</label></td>
+                        <td><input class="form-control" name="jobDesc" type="text" data-rule="required"></td>
+                    </tr>
+                    <tr>
+                        <td >
+                            <button type="button" class="btn-blue" @click="submit('addTimerJobForm_1')" data-icon="save">确定</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </form>
+        </div>
+
+        <div style="padding-bottom: 10px;">
+            <form action="/message/timer/addTimerJobSave" id="addTimerJobForm_2" data-toggle="validate" data-alertmsg="false">
+                <input type="hidden" name="jobType" value="repeatCountSimpleJob">
+                <table class=" table-striped table-condensed table-bordered ">
+                    <thead>
+                    <tr>
+                        <th colspan="2" style="text-align: center">按某个频率执行多少次之后停止的任务</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td><label >开始时间：</label></td>
+                        <td>
+                            <input class="form-control" name="startTime" type="text" data-toggle="datepicker" data-pattern="yyyy-MM-dd HH:mm:ss"
+                                   placeholder="选择日期" data-rule="required">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label >重复次数：</label></td>
+                        <td><input class="form-control" name="repeatCount" type="text" data-rule="required"></td>
+                    </tr>
+                    <tr>
+                        <td><label >时间间隔(秒)：</label></td>
+                        <td><input class="form-control" name="interval" type="text" data-rule="required"></td>
+                    </tr>
+                    <tr>
+                        <td><label >任务分组：</label></td>
+                        <td><input class="form-control" name="jobGroup" type="text" data-rule="required;charOnly"
+                                   data-rule-charOnly="[/^[a-zA-Z][a-zA-Z0-9_.]+$/, '只能输入以字母开头的字母、数字、下划线、点']"></td>
+                    </tr>
+                    <tr>
+                        <td><label >任务名称：</label></td>
+                        <td><input class="form-control" name="jobName" type="text" data-rule="required;charOnly"
+                                   data-rule-charOnly="[/^[a-zA-Z][a-zA-Z0-9_.]+$/, '只能输入以字母开头的字母、数字、下划线、点']"></td>
+                    </tr>
+                    <tr>
+                        <td><label >任务消息目的地：</label></td>
+                        <td><input class="form-control" name="destination" type="text" placeholder="默认是任务分组+任务名称" data-rule="charOnly"
+                                   data-rule-charOnly="[/^[a-zA-Z][a-zA-Z0-9_.]+$/, '只能输入以字母开头的字母、数字、下划线、点']"></td>
+                    </tr>
+                    <tr>
+                        <td><label >参数：</label></td>
+                        <td><input class="form-control" name="jobParam" type="text"></td>
+                    </tr>
+                    <tr>
+                        <td><label >描述：</label></td>
+                        <td><input class="form-control" name="jobDesc" type="text" data-rule="required"></td>
+                    </tr>
+                    <tr>
+                        <td >
+                            <button type="button" class="btn-blue" @click="submit('addTimerJobForm_2')" data-icon="save">确定</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </form>
+        </div>
+
+        <div style="padding-bottom: 10px;">
+            <form action="/message/timer/addTimerJobSave" id="addTimerJobForm_3" data-toggle="validate" data-alertmsg="false">
+                <input type="hidden" name="jobType" value="repeatPeriodSimpleJob">
+                <table class=" table-striped table-condensed table-bordered ">
+                    <thead>
+                    <tr>
+                        <th colspan="2" style="text-align: center">在某个时间段按某个频率执行任务</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td><label >开始时间：</label></td>
+                        <td>
+                            <input class="form-control" name="startTime" type="text" data-toggle="datepicker" data-pattern="yyyy-MM-dd HH:mm:ss"
+                                   placeholder="选择日期" data-rule="required">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label >结束时间：</label></td>
+                        <td><input class="form-control" name="endTime" type="text" data-toggle="datepicker" data-pattern="yyyy-MM-dd HH:mm:ss"
+                                   placeholder="选择日期" data-rule="required"></td>
+                    </tr>
+                    <tr>
+                        <td><label >时间间隔(秒)：</label></td>
+                        <td><input class="form-control" name="interval" type="text" data-rule="required"></td>
+                    </tr>
+                    <tr>
+                        <td><label >任务分组：</label></td>
+                        <td><input class="form-control" name="jobGroup" type="text" data-rule="required;charOnly"
+                                   data-rule-charOnly="[/^[a-zA-Z][a-zA-Z0-9_.]+$/, '只能输入以字母开头的字母、数字、下划线、点']"></td>
+                    </tr>
+                    <tr>
+                        <td><label >任务名称：</label></td>
+                        <td><input class="form-control" name="jobName" type="text" data-rule="required;charOnly"
+                                   data-rule-charOnly="[/^[a-zA-Z][a-zA-Z0-9_.]+$/, '只能输入以字母开头的字母、数字、下划线、点']"></td>
+                    </tr>
+                    <tr>
+                        <td><label >任务消息目的地：</label></td>
+                        <td><input class="form-control" name="destination" type="text" placeholder="默认是任务分组+任务名称" data-rule="charOnly"
+                                   data-rule-charOnly="[/^[a-zA-Z][a-zA-Z0-9_.]+$/, '只能输入以字母开头的字母、数字、下划线、点']"></td>
+                    </tr>
+                    <tr>
+                        <td><label >参数：</label></td>
+                        <td><input class="form-control" name="jobParam" type="text"></td>
+                    </tr>
+                    <tr>
+                        <td><label >描述：</label></td>
+                        <td><input class="form-control" name="jobDesc" type="text" data-rule="required"></td>
+                    </tr>
+                    <tr>
+                        <td >
+                            <button type="button" class="btn-blue" @click="submit('addTimerJobForm_3')" data-icon="save">确定</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </form>
+        </div>
+
+        <div style="padding-bottom: 10px;">
+            <br>
+            <form action="/message/timer/addTimerJobSave" id="addTimerJobForm_4" data-toggle="validate" data-alertmsg="false">
+                <input type="hidden" name="jobType" value="repeatForeverSimpleJob">
+                <table class=" table-striped table-condensed table-bordered ">
+                    <thead>
+                    <tr>
+                        <th colspan="2" style="text-align: center">在某个时间点开始，按某个频率一直执行下去的任务</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td><label >开始时间：</label></td>
+                        <td>
+                            <input class="form-control" name="startTime" type="text" data-toggle="datepicker" data-pattern="yyyy-MM-dd HH:mm:ss"
+                                   placeholder="选择日期" data-rule="required">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label >时间间隔(秒)：</label></td>
+                        <td><input class="form-control" name="interval" type="text" data-rule="required;digits;"></td>
+                    </tr>
+                    <tr>
+                        <td><label >任务分组：</label></td>
+                        <td><input class="form-control" name="jobGroup" type="text" data-rule="required;" data-rule="required;charOnly"
+                                   data-rule-charOnly="[/^[a-zA-Z][a-zA-Z0-9_.]+$/, '只能输入以字母开头的字母、数字、下划线、点']"></td>
+                    </tr>
+                    <tr>
+                        <td><label >任务名称：</label></td>
+                        <td><input class="form-control" name="jobName" type="text" data-rule="required;charOnly"
+                                   data-rule-charOnly="[/^[a-zA-Z][a-zA-Z0-9_.]+$/, '只能输入以字母开头的字母、数字、下划线、点']"></td>
+                    </tr>
+                    <tr>
+                        <td><label >任务消息目的地：</label></td>
+                        <td><input class="form-control" name="destination" type="text" placeholder="默认是任务分组+任务名称" data-rule="charOnly"
+                                   data-rule-charOnly="[/^[a-zA-Z][a-zA-Z0-9_.]+$/, '只能输入以字母开头的字母、数字、下划线、点']"></td>
+                    </tr>
+                    <tr>
+                        <td><label >参数：</label></td>
+                        <td><input class="form-control" name="jobParam" type="text"></td>
+                    </tr>
+                    <tr>
+                        <td><label >描述：</label></td>
+                        <td><input class="form-control" name="jobDesc" type="text" data-rule="required"></td>
+                    </tr>
+                    <tr>
+                        <td >
+                            <button type="button" class="btn-blue" @click="submit('addTimerJobForm_4')" data-icon="save">确定</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </form>
+        </div>
+    </div>
+
+    <div class="cronJob" style="float:right;margin-right: 100px">
+        <div class="centerText" style="padding-top:10px; padding-bottom: 10px; color: red">↓↓↓↓↓以下是cron类型的定时任务↓↓↓↓↓</div>
+
+        <div style="padding-bottom: 10px;">
+            <form action="/message/timer/addTimerJobSave" id="addTimerJobForm_5" data-toggle="validate" data-alertmsg="false">
+                <input type="hidden" name="jobType" value="intervalCronJob">
+                <table class=" table-striped table-condensed table-bordered">
+                    <thead>
+                    <tr>
+                        <th colspan="2" style="text-align: center">每隔多久执行一次的任务</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td><label >时间间隔：</label></td>
+                        <td><input class="form-control" name="interval" type="text" data-rule="required;digits"></td>
+                    </tr>
+                    <tr>
+                        <td><label >时间间隔单位：</label></td>
+                        <td>
+                            <input name="intervalTimeUnit" type="radio" data-toggle="icheck" value="hour" data-label="时" data-rule="checked">
+                            <input name="intervalTimeUnit" type="radio" data-toggle="icheck" value="minute" data-label="分" data-rule="checked">
+                            <input name="intervalTimeUnit" type="radio" data-toggle="icheck" value="second" data-label="秒" data-rule="checked">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label >任务分组：</label></td>
+                        <td><input class="form-control" name="jobGroup" type="text" data-rule="required;charOnly"
+                                   data-rule-charOnly="[/^[a-zA-Z][a-zA-Z0-9_.]+$/, '只能输入以字母开头的字母、数字、下划线、点']"></td>
+                    </tr>
+                    <tr>
+                        <td><label >任务名称：</label></td>
+                        <td><input class="form-control" name="jobName" type="text" data-rule="required;charOnly"
+                                   data-rule-charOnly="[/^[a-zA-Z][a-zA-Z0-9_.]+$/, '只能输入以字母开头的字母、数字、下划线、点']"></td>
+                    </tr>
+                    <tr>
+                        <td><label >任务消息目的地：</label></td>
+                        <td><input class="form-control" name="destination" type="text" placeholder="默认是任务分组+任务名称" data-rule="charOnly"
+                                   data-rule-charOnly="[/^[a-zA-Z][a-zA-Z0-9_.]+$/, '只能输入以字母开头的字母、数字、下划线、点']"></td>
+                    </tr>
+                    <tr>
+                        <td><label >参数：</label></td>
+                        <td><input class="form-control" name="jobParam" type="text"></td>
+                    </tr>
+                    <tr>
+                        <td><label >描述：</label></td>
+                        <td><input class="form-control" name="jobDesc" type="text" data-rule="required"></td>
+                    </tr>
+                    <tr>
+                        <td><label >开始时间：</label></td>
+                        <td>
+                            <input class="form-control" name="startTime" type="text" data-toggle="datepicker" data-pattern="yyyy-MM-dd HH:mm:ss"
+                                   placeholder="选择日期">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label >结束时间：</label></td>
+                        <td><input class="form-control" name="endTime" type="text" data-toggle="datepicker" data-pattern="yyyy-MM-dd HH:mm:ss"
+                                   placeholder="选择日期"></td>
+                    </tr>
+                    <tr>
+                        <td >
+                            <button type="button" class="btn-blue" @click="submit('addTimerJobForm_5')" data-icon="save">确定</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </form>
+        </div>
+
+        <div style="padding-bottom: 10px;">
+            <form action="/message/timer/addTimerJobSave" id="addTimerJobForm_6" data-toggle="validate" data-alertmsg="false">
+                <input type="hidden" name="jobType" value="dailyCronJob">
+                <table class=" table-striped table-condensed table-bordered">
+                    <thead>
+                    <tr>
+                        <th colspan="2" style="text-align: center">每天的某时、某分 执行的任务</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td><label >时：</label></td>
+                        <td><input class="form-control" name="hour" type="text" data-toggle="datepicker" data-pattern="HH"
+                                   data-rule="required">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label >分：</label></td>
+                        <td>
+                            <input class="form-control" name="minute" type="text" data-toggle="datepicker" data-pattern="mm" data-rule="required">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label >任务分组：</label></td>
+                        <td><input class="form-control" name="jobGroup" type="text" data-rule="required;charOnly"
+                                   data-rule-charOnly="[/^[a-zA-Z][a-zA-Z0-9_.]+$/, '只能输入以字母开头的字母、数字、下划线、点']"></td>
+                    </tr>
+                    <tr>
+                        <td><label >任务名称：</label></td>
+                        <td><input class="form-control" name="jobName" type="text" data-rule="required;charOnly"
+                                   data-rule-charOnly="[/^[a-zA-Z][a-zA-Z0-9_.]+$/, '只能输入以字母开头的字母、数字、下划线、点']"></td>
+                    </tr>
+                    <tr>
+                        <td><label >任务消息目的地：</label></td>
+                        <td><input class="form-control" name="destination" type="text" placeholder="默认是任务分组+任务名称" data-rule="charOnly"
+                                   data-rule-charOnly="[/^[a-zA-Z][a-zA-Z0-9_.]+$/, '只能输入以字母开头的字母、数字、下划线、点']"></td>
+                    </tr>
+                    <tr>
+                        <td><label >参数：</label></td>
+                        <td><input class="form-control" name="jobParam" type="text"></td>
+                    </tr>
+                    <tr>
+                        <td><label >描述：</label></td>
+                        <td><input class="form-control" name="jobDesc" type="text" data-rule="required"></td>
+                    </tr>
+                    <tr>
+                        <td><label >开始时间：</label></td>
+                        <td>
+                            <input class="form-control" name="startTime" type="text" data-toggle="datepicker" data-pattern="yyyy-MM-dd HH:mm:ss"
+                                   placeholder="选择日期">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label >结束时间：</label></td>
+                        <td><input class="form-control" name="endTime" type="text" data-toggle="datepicker" data-pattern="yyyy-MM-dd HH:mm:ss"
+                                   placeholder="选择日期"></td>
+                    </tr>
+
+                    <tr>
+                        <td >
+                            <button type="button" class="btn-blue" @click="submit('addTimerJobForm_6')" data-icon="save">确定</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </form>
+        </div>
+
+        <div style="padding-bottom: 10px;">
+            <form action="/message/timer/addTimerJobSave" id="addTimerJobForm_7" data-toggle="validate" data-alertmsg="false">
+                <input type="hidden" name="jobType" value="dailyPeriodCronJob">
+                <table class=" table-striped table-condensed table-bordered">
+                    <thead>
+                    <tr>
+                        <th colspan="2" style="text-align: center">每天的几点到几点每隔几分钟执行的任务</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td><label >几点开始：</label></td>
+                        <td><input class="form-control" name="hourStart" type="text" data-toggle="datepicker" data-pattern="HH"
+                                   data-rule="required">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label >几点结束：</label></td>
+                        <td>
+                            <input class="form-control" name="hourEnd" type="text" data-toggle="datepicker" data-pattern="HH" data-rule="required">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label >时间间隔(分)：</label></td>
+                        <td><input class="form-control" name="interval" type="text" data-rule="required;minute"
+                                   data-rule-minute="[/^([1-9]|[1-5][0-9])$/, '请输入1到59的整数']"></td>
+                    </tr>
+                    <tr>
+                        <td><label >任务分组：</label></td>
+                        <td><input class="form-control" name="jobGroup" type="text" data-rule="required;charOnly"
+                                   data-rule-charOnly="[/^[a-zA-Z][a-zA-Z0-9_.]+$/, '只能输入以字母开头的字母、数字、下划线、点']"></td>
+                    </tr>
+                    <tr>
+                        <td><label >任务名称：</label></td>
+                        <td><input class="form-control" name="jobName" type="text" data-rule="required;charOnly"
+                                   data-rule-charOnly="[/^[a-zA-Z][a-zA-Z0-9_.]+$/, '只能输入以字母开头的字母、数字、下划线、点']"></td>
+                    </tr>
+                    <tr>
+                        <td><label >任务消息目的地：</label></td>
+                        <td><input class="form-control" name="destination" type="text" placeholder="默认是任务分组+任务名称" data-rule="charOnly"
+                                   data-rule-charOnly="[/^[a-zA-Z][a-zA-Z0-9_.]+$/, '只能输入以字母开头的字母、数字、下划线、点']"></td>
+                    </tr>
+                    <tr>
+                        <td><label >参数：</label></td>
+                        <td><input class="form-control" name="jobParam" type="text"></td>
+                    </tr>
+                    <tr>
+                        <td><label >描述：</label></td>
+                        <td><input class="form-control" name="jobDesc" type="text" data-rule="required"></td>
+                    </tr>
+                    <tr>
+                        <td><label >开始时间：</label></td>
+                        <td>
+                            <input class="form-control" name="startTime" type="text" data-toggle="datepicker" data-pattern="yyyy-MM-dd HH:mm:ss"
+                                   placeholder="选择日期">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label >结束时间：</label></td>
+                        <td><input class="form-control" name="endTime" type="text" data-toggle="datepicker" data-pattern="yyyy-MM-dd HH:mm:ss"
+                                   placeholder="选择日期"></td>
+                    </tr>
+
+                    <tr>
+                        <td >
+                            <button type="button" class="btn-blue" @click="submit('addTimerJobForm_7')" data-icon="save">确定</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </form>
+        </div>
+
+        <div style="padding-bottom: 10px;">
+            <form action="/message/timer/addTimerJobSave" id="addTimerJobForm_8" data-toggle="validate" data-alertmsg="false">
+                <input type="hidden" name="jobType" value="weeklyCronJob">
+                <table class=" table-striped table-condensed table-bordered">
+                    <thead>
+                    <tr>
+                        <th colspan="2" style="text-align: center">每逢周几的某时、某分 执行的任务</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td><label >星期：</label></td>
+                        <td>
+                            <select class="form-control" name="weekdays" data-toggle="selectpicker" data-rule="required" multiple>
+                                <option value="1">星期一</option>
+                                <option value="2">星期二</option>
+                                <option value="3">星期三</option>
+                                <option value="4">星期四</option>
+                                <option value="5">星期五</option>
+                                <option value="6">星期六</option>
+                                <option value="7">星期日</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label >时：</label></td>
+                        <td><input class="form-control" name="hour" type="text" data-toggle="datepicker" data-pattern="HH" data-rule="required"></td>
+                    </tr>
+                    <tr>
+                        <td><label >分：</label></td>
+                        <td><input class="form-control" name="minute" type="text" data-toggle="datepicker" data-pattern="mm" data-rule="required"></td>
+                    </tr>
+                    <tr>
+                        <td><label >任务分组：</label></td>
+                        <td><input class="form-control" name="jobGroup" type="text" data-rule="required;charOnly"
+                                   data-rule-charOnly="[/^[a-zA-Z][a-zA-Z0-9_.]+$/, '只能输入以字母开头的字母、数字、下划线、点']"></td>
+                    </tr>
+                    <tr>
+                        <td><label >任务名称：</label></td>
+                        <td><input class="form-control" name="jobName" type="text" data-rule="required;charOnly"
+                                   data-rule-charOnly="[/^[a-zA-Z][a-zA-Z0-9_.]+$/, '只能输入以字母开头的字母、数字、下划线、点']"></td>
+                    </tr>
+                    <tr>
+                        <td><label >任务消息目的地：</label></td>
+                        <td><input class="form-control" name="destination" type="text" placeholder="默认是任务分组+任务名称" data-rule="charOnly"
+                                   data-rule-charOnly="[/^[a-zA-Z][a-zA-Z0-9_.]+$/, '只能输入以字母开头的字母、数字、下划线、点']"></td>
+                    </tr>
+                    <tr>
+                        <td><label >参数：</label></td>
+                        <td><input class="form-control" name="jobParam" type="text"></td>
+                    </tr>
+                    <tr>
+                        <td><label >描述：</label></td>
+                        <td><input class="form-control" name="jobDesc" type="text" data-rule="required"></td>
+                    </tr>
+                    <tr>
+                        <td><label >开始时间：</label></td>
+                        <td>
+                            <input class="form-control" name="startTime" type="text" data-toggle="datepicker" data-pattern="yyyy-MM-dd HH:mm:ss"
+                                   placeholder="选择日期">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label >结束时间：</label></td>
+                        <td><input class="form-control" name="endTime" type="text" data-toggle="datepicker" data-pattern="yyyy-MM-dd HH:mm:ss"
+                                   placeholder="选择日期">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td >
+                            <button type="button" class="btn-blue" @click="submit('addTimerJobForm_8')" data-icon="save">确定</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </form>
+        </div>
+
+        <div style="padding-bottom: 10px;">
+            <form action="/message/timer/addTimerJobSave" id="addTimerJobForm_9" data-toggle="validate" data-alertmsg="false">
+                <input type="hidden" name="jobType" value="monthlyCronJob">
+                <table class=" table-striped table-condensed table-bordered">
+                    <thead>
+                    <tr>
+                        <th colspan="2" style="text-align: center">每逢某日(或某几日)的某时、某分 执行的任务</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td><label >日期：</label></td>
+                        <td>
+                            <select class="form-control" name="dates" data-toggle="selectpicker" data-rule="required" multiple>
+                                <option v-for="date in dateArray" v-bind:value="date">{{date}}日</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label >时：</label></td>
+                        <td><input class="form-control" name="hour" type="text" data-toggle="datepicker" data-pattern="HH" data-rule="required"></td>
+                    </tr>
+                    <tr>
+                        <td><label >分：</label></td>
+                        <td><input class="form-control" name="minute" type="text" data-toggle="datepicker" data-pattern="mm" data-rule="required"></td>
+                    </tr>
+                    <tr>
+                        <td><label >任务分组：</label></td>
+                        <td><input class="form-control" name="jobGroup" type="text" data-rule="required;charOnly"
+                                   data-rule-charOnly="[/^[a-zA-Z][a-zA-Z0-9_.]+$/, '只能输入以字母开头的字母、数字、下划线、点']"></td>
+                    </tr>
+                    <tr>
+                        <td><label >任务名称：</label></td>
+                        <td><input class="form-control" name="jobName" type="text" data-rule="required;charOnly"
+                                   data-rule-charOnly="[/^[a-zA-Z][a-zA-Z0-9_.]+$/, '只能输入以字母开头的字母、数字、下划线、点']"></td>
+                    </tr>
+                    <tr>
+                        <td><label >任务消息目的地：</label></td>
+                        <td><input class="form-control" name="destination" type="text" placeholder="默认是任务分组+任务名称" data-rule="charOnly"
+                                   data-rule-charOnly="[/^[a-zA-Z][a-zA-Z0-9_.]+$/, '只能输入以字母开头的字母、数字、下划线、点']"></td>
+                    </tr>
+                    <tr>
+                        <td><label >参数：</label></td>
+                        <td><input class="form-control" name="jobParam" type="text"></td>
+                    </tr>
+                    <tr>
+                        <td><label >描述：</label></td>
+                        <td><input class="form-control" name="jobDesc" type="text" data-rule="required"></td>
+                    </tr>
+                    <tr>
+                        <td><label >开始时间：</label></td>
+                        <td>
+                            <input class="form-control" name="startTime" type="text" data-toggle="datepicker" data-pattern="yyyy-MM-dd HH:mm:ss"
+                                   placeholder="选择日期">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label >结束时间：</label></td>
+                        <td><input class="form-control" name="endTime" type="text" data-toggle="datepicker" data-pattern="yyyy-MM-dd HH:mm:ss"
+                                   placeholder="选择日期">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td >
+                            <button type="button" class="btn-blue" @click="submit('addTimerJobForm_9')" data-icon="save">确定</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </form>
+        </div>
+
+        <div style="padding-bottom: 10px;">
+            <form action="/message/timer/addTimerJobSave" id="addTimerJobForm_10" data-toggle="validate" data-alertmsg="false">
+                <input type="hidden" name="jobType" value="selfDefinedCronJob">
+                <table class=" table-striped table-condensed table-bordered">
+                    <thead>
+                    <tr>
+                        <th colspan="2" style="text-align: center">自定义cron表达式的任务</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td><label>cron表达式</label></td>
+                        <td><input class="form-control" name="cronExpression" type="text" data-rule="required"></td>
+                    </tr>
+                    <tr>
+                        <td><label >任务分组：</label></td>
+                        <td><input class="form-control" name="jobGroup" type="text" data-rule="required;charOnly"
+                                   data-rule-charOnly="[/^[a-zA-Z][a-zA-Z0-9_.]+$/, '只能输入以字母开头的字母、数字、下划线、点']"></td>
+                    </tr>
+                    <tr>
+                        <td><label >任务名称：</label></td>
+                        <td><input class="form-control" name="jobName" type="text" data-rule="required;charOnly"
+                                   data-rule-charOnly="[/^[a-zA-Z][a-zA-Z0-9_.]+$/, '只能输入以字母开头的字母、数字、下划线、点']"></td>
+                    </tr>
+                    <tr>
+                        <td><label >任务消息目的地：</label></td>
+                        <td><input class="form-control" name="destination" type="text" placeholder="默认是任务分组+任务名称" data-rule="charOnly"
+                                   data-rule-charOnly="[/^[a-zA-Z][a-zA-Z0-9_.]+$/, '只能输入以字母开头的字母、数字、下划线、点']"></td>
+                    </tr>
+                    <tr>
+                        <td><label >参数：</label></td>
+                        <td><input class="form-control" name="jobParam" type="text"></td>
+                    </tr>
+                    <tr>
+                        <td><label >描述：</label></td>
+                        <td><input class="form-control" name="jobDesc" type="text" data-rule="required"></td>
+                    </tr>
+                    <tr>
+                        <td><label >开始时间：</label></td>
+                        <td>
+                            <input class="form-control" name="startTime" type="text" data-toggle="datepicker" data-pattern="yyyy-MM-dd HH:mm:ss"
+                                   placeholder="选择日期">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label >结束时间：</label></td>
+                        <td><input class="form-control" name="endTime" type="text" data-toggle="datepicker" data-pattern="yyyy-MM-dd HH:mm:ss"
+                                   placeholder="选择日期">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td >
+                            <button type="button" class="btn-blue" @click="submit('addTimerJobForm_10')" data-icon="save">确定</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .centerText{
+        margin: 0 auto;
+        text-align: center;
+    }
+</style>

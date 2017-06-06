@@ -1,0 +1,133 @@
+<script>
+    var authList = ${authList};
+    var parentIdMap = ${parentIdMap};
+    var openGifUrl = "/static/images/open.gif";
+    var closeGifUrl = "/static/images/close.gif";
+
+    var authListHeader = new Vue({
+        el:"#authListHeader",
+        data:{}
+    });
+
+    var authListTable = new Vue({
+        el:"#authListTable",
+        data:{
+            authList: authList,
+            parentIdMap:parentIdMap,
+            openGifUrl:openGifUrl,
+            closeGifUrl:closeGifUrl,
+        },
+        methods:{
+            deleteAuth: function(authId){//删除节点
+                var uri = "/auth/auth/deleteAuth?authId="+authId;
+                BJUI.alertmsg("confirm", "确定删除当前节点吗？", {
+                    okCall: function() {
+                        BJUI.ajax('doajax', {
+                            url: uri,
+                            loadingmask: true,
+                            okCallback: function(json, options) {
+                                if(json.statusCode == BJUI.statusCode.ok){
+                                    BJUI.alertmsg("ok", "删除节点成功");
+                                    freshNavtab();
+                                }else{
+                                    BJUI.alertmsg("error", json.message);
+                                }
+                            }
+                        });
+                    }
+                });
+            },
+            isParent: function(authId){//判断是否属于父节点
+                if(typeof(this.parentIdMap[authId]) != "undefined"){
+                    return true;
+                }else{
+                    return false;
+                }
+            },
+            nbspRepeat: function(repeatTimes){//空格重复
+                var baseStr = "&nbsp;&nbsp;&nbsp;&nbsp;";
+                var returnStr="";
+                for(var i=0; i < repeatTimes-1; i++){
+                    returnStr += baseStr;
+                }
+                return returnStr;
+            },
+            formatTime: function(timeStamp){//格式化日期
+                return DateUtil.formatTime(timeStamp, "yyyy-MM-dd HH:mm:ss");
+            },
+            foldAndExpand: function(event){//节点展开、递归折叠
+                var target = event.target;
+                var id = $(target).attr('data-id');
+                var show = $(target).attr('src');
+                var child = $('tr[data-parentId=' + id + ']');
+                if(show == openGifUrl){
+                    child.removeClass("hidden");
+                    $(target).attr('src', closeGifUrl);
+                }else if(show == closeGifUrl){
+                    child.addClass("hidden");
+                    $(target).attr('src', openGifUrl);
+                    child.find(".authChange").attr('src', closeGifUrl).click().attr('src', openGifUrl);
+                }
+            },
+        },
+    });
+    function freshNavtab(){
+        BJUI.navtab("refresh");
+    }
+</script>
+
+<div class="bjui-pageHeader" id="authListHeader">
+    <a href="/auth/auth/addAuthView" class="btn btn-green" data-toggle="dialog" data-id="add-auth" data-height="600" data-width="600"
+       data-mask="true" data-icon="plus" data-options="{onClose:freshNavtab}" v-if="access('/auth/auth/addAuthView')">新建权限</a>&nbsp;
+</div>
+
+<div class="bjui-pageContent tableContent" >
+    <table class="table table-bordered table-hover" id="authListTable">
+        <thead>
+        <tr>
+            <th align="center">权限名称</th>
+            <th align="center">level</th>
+            <th align="center">权限检查等级</th>
+            <th align="center">状态</th>
+            <th align="center">添加时间</th>
+            <th align="center">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="(vo, index) in authList" v-bind:data-id="vo.id" v-bind:data-parentid="vo.parentId" v-bind:class="vo.parentId == 0 ? '':'hidden'">
+            <td title="权限名称">
+                <span v-html="nbspRepeat(vo.level)"></span>
+                <span v-if="isParent(vo.id)">
+                    <img v-bind:data-id="vo.id" class="authChange" @click="foldAndExpand($event)" v-bind:src="openGifUrl" alt=""
+                         style="cursor:pointer;"/>
+                </span>
+                <span v-else>{{nbspRepeat(1)}}</span>
+                <span>{{vo.parentId==0 ? vo.name : '∟'+vo.name}}</span>
+            </td>
+            <td align="center" title="level">{{vo.level}}</td>
+            <td align="center" title="权限检查等级">
+                <span v-if="vo.checkLevel==1" style="color: #d58512">游客可访问</span>
+                <span v-else-if="vo.checkLevel==2" style="color: #5bc0de">登陆可访问</span>
+                <span v-else-if="vo.checkLevel==3" style="color: #00B83F">授权可访问</span>
+            </td>
+            <td align="center" title="状态" v-bind:style="vo.status==1 ? 'color:green;' : ''">{{vo.status==1 ? '有效':'禁用'}}</td>
+            <td align="center" title="添加时间">{{formatTime(vo.createTime)}}</td>
+            <td align="center">
+                <a v-bind:href="'/auth/auth/editAuthView?authId='+vo.id" data-toggle="dialog" data-mask="true" class="btn btn-blue"
+                   data-width="500" data-height="400" data-options="{onClose:freshNavtab}" v-if="access('/auth/auth/editAuthView')">编辑
+                </a>
+
+                <a v-bind:href="'/auth/auth/addChildAuth?authId='+vo.id" data-toggle="dialog" data-mask="true" class="btn btn-blue"
+                   data-width="500" data-height="600" data-options="{onClose:'freshNavtab'}" v-if="access('/auth/auth/addChildAuth')">添加子权限
+                </a>
+
+                <a v-bind:href="'/auth/auth/assignNodeView?authId='+vo.id" data-toggle="dialog" data-mask="true" class="btn btn-blue"
+                   data-width="800" data-height="700" v-if="access('/auth/auth/assignNodeView')">分配节点
+                </a>
+
+                <a @click="deleteAuth(vo.id)" class="btn btn-red" v-if="access('/auth/auth/deleteAuth')">删除</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>

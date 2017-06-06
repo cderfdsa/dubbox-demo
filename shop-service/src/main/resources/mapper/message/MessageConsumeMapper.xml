@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cyf.shop.message.bean.MessageConsume">
+	<sql id="table"> message_consume </sql>
+
+	<!-- 用于返回的bean对象 -->
+	<resultMap id="beanMap" type="com.cyf.shop.message.bean.MessageConsume">
+		<result column="id" property="id" jdbcType="BIGINT"/>
+		<result column="name" property="name" jdbcType="VARCHAR"/>
+		<result column="type" property="type" jdbcType="TINYINT"/>
+		<result column="payload" property="payload" jdbcType="LONGVARCHAR"/>
+		<result column="consumer" property="consumer" jdbcType="VARCHAR"/>
+		<result column="messageDesc" property="messageDesc" jdbcType="VARCHAR"/>
+		<result column="createTime" property="createTime" jdbcType="TIMESTAMP"/>
+		<result column="isTimer" property="isTimer" jdbcType="TINYINT"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列，每一个字段都用as取一个别名时为了排序方便，也是为了其他自定义语句方便使用beanMap -->
+	<sql id="fields">
+		id as id,
+		name as name,
+		type as type,
+		payload as payload,
+		consumer as consumer,
+		messageDesc as messageDesc,
+		create_time as createTime,
+		is_timer as isTimer
+	</sql>
+
+	<!-- 多条件组合查询的条件(如：IN LIKE BETWEEN = > < 等等的查询) -->
+	<sql id="condWhere">
+		<where>
+			<if test="id != null">
+				AND id = #{id,jdbcType=BIGINT}
+			</if>
+			<if test="idList != null and idList.size() > 0">
+				AND id IN <foreach collection="idList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+			</if>
+			<if test="name != null and name != ''">
+				AND name = #{name,jdbcType=VARCHAR}
+			</if>
+			<if test="nameLike != null and nameLike != ''">
+				AND name LIKE CONCAT('%',#{nameLike,jdbcType=VARCHAR},'%')
+			</if>
+			<if test="type != null">
+				AND type = #{type,jdbcType=TINYINT}
+			</if>
+			<if test="typeList != null and typeList.size() > 0">
+				AND type IN <foreach collection="typeList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=TINYINT}</foreach>
+			</if>
+			<if test="payload != null and payload != ''">
+				AND payload = #{payload,jdbcType=LONGVARCHAR}
+			</if>
+			<if test="payloadLike != null and payloadLike != ''">
+				AND payload LIKE CONCAT('%',#{payloadLike,jdbcType=LONGVARCHAR},'%')
+			</if>
+			<if test="consumer != null and consumer != ''">
+				AND consumer = #{consumer,jdbcType=VARCHAR}
+			</if>
+			<if test="consumerLike != null and consumerLike != ''">
+				AND consumer LIKE CONCAT('%',#{consumerLike,jdbcType=VARCHAR},'%')
+			</if>
+			<if test="messageDesc != null and messageDesc != ''">
+				AND messageDesc = #{messageDesc,jdbcType=VARCHAR}
+			</if>
+			<if test="messageDescLike != null and messageDescLike != ''">
+				AND messageDesc LIKE CONCAT('%',#{messageDescLike,jdbcType=VARCHAR},'%')
+			</if>
+			<if test="createTimeStart != null">
+				AND create_time &gt;= #{createTimeStart,jdbcType=TIMESTAMP}
+			</if>
+			<if test="createTimeEnd != null">
+				AND create_time &lt; #{createTimeEnd,jdbcType=TIMESTAMP}
+			</if>
+			<if test="isTimer != null">
+				AND is_timer = #{isTimer,jdbcType=TINYINT}
+			</if>
+			<if test="isTimerList != null and isTimerList.size() > 0">
+				AND is_timer IN <foreach collection="isTimerList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=TINYINT}</foreach>
+			</if>
+		</where>
+	</sql>
+
+	<!-- 插入记录 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="com.cyf.shop.message.bean.MessageConsume">
+		INSERT INTO <include refid="table" /> (
+        	id ,
+        	name ,
+        	type ,
+        	payload ,
+        	consumer ,
+        	messageDesc ,
+        	create_time ,
+        	is_timer 
+        ) VALUES (
+        	#{id,jdbcType=BIGINT} ,
+        	#{name,jdbcType=VARCHAR} ,
+        	#{type,jdbcType=TINYINT} ,
+        	#{payload,jdbcType=LONGVARCHAR} ,
+        	#{consumer,jdbcType=VARCHAR} ,
+        	#{messageDesc,jdbcType=VARCHAR} ,
+        	#{createTime,jdbcType=TIMESTAMP} ,
+        	#{isTimer,jdbcType=TINYINT} 
+        )
+	</insert>
+
+	<!-- 批量插入记录 -->
+	<insert id="insertList" useGeneratedKeys="true" keyProperty="id" parameterType="list">
+		INSERT INTO <include refid="table" /> (
+        	id ,
+        	name ,
+        	type ,
+        	payload ,
+        	consumer ,
+        	messageDesc ,
+        	create_time ,
+        	is_timer 
+        ) VALUES 
+		<foreach collection="list" item="item" separator=",">
+			(
+			#{item.id,jdbcType=BIGINT},
+			#{item.name,jdbcType=VARCHAR},
+			#{item.type,jdbcType=TINYINT},
+			#{item.payload,jdbcType=LONGVARCHAR},
+			#{item.consumer,jdbcType=VARCHAR},
+			#{item.messageDesc,jdbcType=VARCHAR},
+			#{item.createTime,jdbcType=TIMESTAMP},
+			#{item.isTimer,jdbcType=TINYINT}
+			)
+		</foreach>
+	</insert>
+
+	<!--动态删除-->
+	 <delete id="deleteBy">
+        DELETE FROM <include refid="table" /> <include refid="condWhere"/>  
+    </delete>
+    
+	<!--更新-->
+	<update id="update" parameterType="com.cyf.shop.message.bean.MessageConsume">
+        UPDATE <include refid="table" /> SET
+			name = #{name,jdbcType=VARCHAR},
+			type = #{type,jdbcType=TINYINT},
+			payload = #{payload,jdbcType=LONGVARCHAR},
+			consumer = #{consumer,jdbcType=VARCHAR},
+			messageDesc = #{messageDesc,jdbcType=VARCHAR},
+			create_time = #{createTime,jdbcType=TIMESTAMP},
+			is_timer = #{isTimer,jdbcType=TINYINT}
+         WHERE id = #{id,jdbcType=BIGINT}
+	</update>
+
+	<!-- 只更新值不为null的字段 -->
+	<update id="updateIfNotNull" parameterType="com.cyf.shop.message.bean.MessageConsume">
+		UPDATE <include refid="table" />
+		<set>
+			<if test="name != null">
+				name=#{name,jdbcType=VARCHAR},
+			</if>
+			<if test="type != null">
+				type=#{type,jdbcType=TINYINT},
+			</if>
+			<if test="payload != null">
+				payload=#{payload,jdbcType=LONGVARCHAR},
+			</if>
+			<if test="consumer != null">
+				consumer=#{consumer,jdbcType=VARCHAR},
+			</if>
+			<if test="messageDesc != null">
+				messageDesc=#{messageDesc,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				create_time=#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="isTimer != null">
+				is_timer=#{isTimer,jdbcType=TINYINT},
+			</if>
+		</set>
+		WHERE id = #{id,jdbcType=BIGINT}
+	</update>
+	
+	<!-- 批量更新 -->
+	<update id="updateList" parameterType="list">
+        UPDATE <include refid="table" /> SET
+			name = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.name,jdbcType=VARCHAR}
+			</foreach>
+			,
+			type = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.type,jdbcType=TINYINT}
+			</foreach>
+			,
+			payload = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.payload,jdbcType=LONGVARCHAR}
+			</foreach>
+			,
+			consumer = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.consumer,jdbcType=VARCHAR}
+			</foreach>
+			,
+			messageDesc = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.messageDesc,jdbcType=VARCHAR}
+			</foreach>
+			,
+			create_time = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.createTime,jdbcType=TIMESTAMP}
+			</foreach>
+			,
+			is_timer = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.isTimer,jdbcType=TINYINT}
+			</foreach>
+			
+		WHERE id IN <foreach collection="list" item="item" index="index" open="(" separator="," close=")">#{item.id,jdbcType=BIGINT}</foreach>
+	</update>
+
+	<!-- 多条件精确查询时计算总记录数 -->
+    <select id="countByCond" resultType="int">
+        SELECT count(*) FROM <include refid="table" /> 
+		<include refid="condWhere"/>
+    </select>
+
+	<!-- 多条件组合查询 -->
+    <select id="listByCond" resultMap="beanMap">
+    	SELECT <include refid="fields" />
+	    FROM <include refid="table" /> 
+		<include refid="condWhere"/>
+		<if test="sortColumns != null">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+	
+	<!-- 取得所有记录，只在表数据量少时使用 -->
+    <select id="listAll" resultMap="beanMap">
+    	SELECT <include refid="fields" />
+	    FROM <include refid="table" /> 
+		<if test="sortColumns != null">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+	<!-- 多条件组合查询，然后由mybatis转成Map之后返回，key字段在调用时指定 -->
+    <select id="mapByCond" resultMap="beanMap">
+    	SELECT <include refid="fields" />
+	    FROM <include refid="table" /> 
+		<include refid="condWhere"/>
+    </select>
+
+	<!-- 根据唯一键查询(如果有的话) -->
+
+
+	<!--按id主键删除-->
+	<delete id="deleteById">
+        DELETE FROM <include refid="table" /> WHERE id = #{id,jdbcType=BIGINT}
+    </delete>
+
+	<!--按多个id主键删除-->
+	<delete id="deleteByIdList">
+        DELETE FROM <include refid="table" /> 
+		WHERE id in <foreach collection="list" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+    </delete>
+    
+	<!-- 根据id查询 -->
+    <select id="getById" resultMap="beanMap">
+		SELECT <include refid="fields" /> 
+		FROM <include refid="table" /> 
+		WHERE id = #{id,jdbcType=BIGINT}  
+	</select>
+
+	<!-- 根据多个id批量查询 -->
+	<select id="listByIdList" resultMap="beanMap">
+		SELECT <include refid="fields" /> 
+		FROM <include refid="table" /> 
+		WHERE id in 
+		<foreach collection="list" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+	</select>
+
+	<!-- 多条件组合查询，然后由mybatis转成以id为key的Map之后返回 -->
+    <select id="mapByIdCond" resultMap="beanMap">
+    	SELECT <include refid="fields" />
+	    FROM <include refid="table" /> 
+		<include refid="condWhere"/>
+    </select>
+</mapper>
+

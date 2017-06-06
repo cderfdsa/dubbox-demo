@@ -1,0 +1,56 @@
+<script type="text/javascript">
+    var role = ${role};
+    var roleEditContainer;
+
+    $(function () {
+        roleEditContainer = new Vue({
+            el: '#editRoleForm',
+            data: {
+                role: role,
+            },
+            computed: {
+            },
+            methods: {
+            }
+        });
+    });
+</script>
+
+<div class="bjui-pageContent">
+    <form action="/auth/role/editRoleSave" id="editRoleForm" data-toggle="validate" data-alertmsg="false">
+        <input type="hidden" name="id" v-bind:value="role.id">
+        <div class="bjui-row col-1">
+            <label class="row-label">角色名称：</label>
+            <div class="row-input required">
+                <input class="form-control" name="name" v-bind:value="role.name" type="text" data-rule="required">
+            </div>
+
+            <label class="row-label">角色类型：</label>
+            <div class="row-input required">
+                <input name="type" value="1" data-toggle="icheck" data-label="普通角色" type="radio" checked="checked" data-rule="required">
+            </div>
+
+            <label class="row-label">备注：</label>
+            <div class="row-input">
+                <input name="remark"  v-bind:value="role.remark" type="text">
+            </div>
+
+            <label class="row-label">状态：</label>
+            <div class="row-input required">
+                <input name="status" value="1" data-toggle="icheck" data-label="正常" type="radio" v-bind:checked="role.status==1">
+                <input name="status" value="2" data-toggle="icheck" data-label="禁用" type="radio" v-bind:checked="role.status==2">
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="bjui-pageFooter">
+    <ul>
+        <li>
+            <button type="button" class="btn-close" data-icon="close">取消</button>
+        </li>
+        <li>
+            <button type="submit" class="btn-blue" data-icon="save">确定</button>
+        </li>
+    </ul>
+</div>

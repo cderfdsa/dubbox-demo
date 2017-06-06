@@ -1,0 +1,91 @@
+<script>
+    var nodeList = ${nodeList};
+
+    var addNodeForm = new Vue({
+        el:"#addNodeForm",
+        data:{
+            nodeList: nodeList,
+        },
+        methods:{
+            nbspRepeat: function(repeatTimes){//空格重复
+                var baseStr = "&nbsp;&nbsp;&nbsp;&nbsp;";
+                var returnStr="";
+                for(var i=0; i < repeatTimes-1; i++){
+                    returnStr += baseStr;
+                }
+                return returnStr;
+            },
+        },
+    });
+</script>
+
+<div class="bjui-pageContent">
+    <form action="/auth/node/addNodeSave" id="addNodeForm" data-toggle="validate" data-alertmsg="false">
+        <div class="bjui-row col-1">
+            <label class="row-label">节点名称：</label>
+            <div class="row-input required">
+                <input class="" name="name" type="text" data-rule="required">
+            </div>
+
+            <label class="row-label">节点类型：</label>
+            <div class="row-input required">
+                <input name="type" value="1" data-toggle="icheck" data-label="菜单" type="radio" data-rule="checked">
+                <input name="type" value="2" data-toggle="icheck" data-label="元素" type="radio" checked="checked" data-rule="checked">
+            </div>
+
+            <label class="row-label">节点url：</label>
+            <div class="row-input">
+                <input name="url" class="" type="text">
+            </div>
+
+            <label class="row-label">节点图标：</label>
+            <div class="row-input">
+                <input name="icon" class="" type="text">
+            </div>
+
+            <label class="row-label">是否独占：</label>
+            <div class="row-input required">
+                <input name="exclusive" value="1" data-toggle="icheck" data-label="是" type="radio" checked="checked" data-rule="checked">
+                <input name="exclusive" value="0" data-toggle="icheck" data-label="否" type="radio" data-rule="checked">
+            </div>
+
+            <label class="row-label">class属性：</label>
+            <div class="row-input">
+                <input name="classAttr" class="" type="text">
+            </div>
+
+            <label class="row-label">父节点：</label>
+            <div class="row-input required">
+                <select name="parentId" class="" data-toggle="selectpicker" data-rule="checked">
+                    <option value="0">根节点</option>
+                    <option v-for="vo in nodeList"
+                            v-bind:value="vo.id"
+                            v-html="nbspRepeat(vo.level)+(vo.parentId==0 ? vo.name : '∟'+vo.name) ">
+                    </option>
+                </select>
+            </div>
+
+            <label class="row-label">排序：</label>
+            <div class="row-input">
+                <input name="sort" class="" type="text" data-rule="digits">
+            </div>
+
+            <label class="row-label">状态：</label>
+            <div class="row-input required">
+                <input name="status" value="1" data-toggle="icheck" data-label="正常" type="radio" checked="checked" data-rule="checked">
+                <input name="status" value="2" data-toggle="icheck" data-label="禁用" type="radio" data-rule="checked">
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="bjui-pageFooter">
+    <ul>
+        <li>
+            <button type="button" class="btn-close" data-icon="close">取消</button>
+        </li>
+        <li>
+            <button type="submit" class="btn-blue" data-icon="save">确定</button>
+        </li>
+    </ul>
+</div>

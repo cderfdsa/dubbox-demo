@@ -1,0 +1,81 @@
+<script>
+    var timerJob = ${timerJob};
+
+    var timerJobContainer = new Vue({
+        el:"#timerJobContainer",
+        data:{
+            timerJob: timerJob,
+        },
+    })
+</script>
+
+<div class="bjui-pageContent" id="timerJobContainer">
+    <form action="/message/message/sendQueueSave" id="sendQueueForm_1" data-toggle="validate" data-alertmsg="false">
+        <table class=" table-striped table-condensed table-bordered">
+            <thead>
+            </thead>
+            <tbody>
+            <tr>
+                <td><label >任务分组：</label></td>
+                <td><input class="form-control" type="text" v-bind:value="timerJob.jobGroup" readonly="readonly"></td>
+            </tr>
+            <tr>
+                <td><label >任务名称：</label></td>
+                <td><input class="form-control" type="text" v-bind:value="timerJob.jobName" readonly="readonly"></td>
+            </tr>
+            <tr>
+                <td><label >任务类型：</label></td>
+                <td><input class="form-control" type="text" v-bind:value="timerJob.jobType==1 ? 'cron任务' : '常规重复性任务'" readonly="readonly"></td>
+            </tr>
+            <tr>
+                <td><label >任务消息目的地：</label></td>
+                <td><input class="form-control" type="text" v-bind:value="timerJob.destination" readonly="readonly"></td>
+            </tr>
+            <tr>
+                <td><label >在定时计划中：</label></td>
+                <td><input class="form-control" type="text" v-bind:value="timerJob.isScheduling ? '是':'否'" readonly="readonly"></td>
+            </tr>
+            <tr>
+                <td><label >任务参数：</label></td>
+                <td><input class="form-control"type="text" v-bind:value="timerJob.jobParamJson" readonly="readonly"></td>
+            </tr>
+            <tr>
+                <td><label >任务开始时间：</label></td>
+                <td><input class="form-control" type="text" v-bind:value="timerJob.startTime" readonly="readonly"></td>
+            </tr>
+            <tr>
+                <td><label >任务结束时间：</label></td>
+                <td><input class="form-control" type="text" v-bind:value="timerJob.endTime" readonly="readonly"></td>
+            </tr>
+            <tr>
+                <td><label >cron表达式：</label></td>
+                <td><input class="form-control" type="text" v-bind:value="timerJob.cronExpression" readonly="readonly"></td>
+            </tr>
+            <tr>
+                <td><label >重复的次数：</label></td>
+                <td><input class="form-control" type="text" v-bind:value="timerJob.repeatCount" readonly="readonly"></td>
+            </tr>
+            <tr>
+                <td><label >间隔时间：</label></td>
+                <td><input class="form-control" type="text" v-bind:value="timerJob.intervals" readonly="readonly"></td>
+            </tr>
+            <tr>
+                <td><label >描述：</label></td>
+                <td><textarea class="form-control" v-model="timerJob.jobDesc" readonly="readonly"></textarea></td>
+            </tr>
+            <tr>
+                <td><label >任务状态：</label></td>
+                <td>
+                    <input class="form-control" type="text" readonly="readonly" value="有效" v-if="timerJob.jobStatus == 1">
+                    <input class="form-control" type="text" readonly="readonly" value="暂停" v-if="timerJob.jobStatus == 2">
+                    <input class="form-control" type="text" readonly="readonly" value="缓停" v-if="timerJob.jobStatus == 3">
+                </td>
+            </tr>
+            <tr>
+                <td><label >创建时间：</label></td>
+                <td><input class="form-control" type="text" v-bind:value="timerJob.createTime" readonly="readonly"></td>
+            </tr>
+            </tbody>
+        </table>
+    </form>
+</div>

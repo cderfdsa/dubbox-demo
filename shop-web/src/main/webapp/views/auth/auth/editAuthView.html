@@ -1,0 +1,71 @@
+<script>
+    var auth = ${auth};
+    var authList = ${authList};
+
+    var addAuthForm = new Vue({
+        el:"#editAuthForm",
+        data:{
+            auth: auth,
+            authList: authList,
+        },
+        methods:{
+            nbspRepeat: function(repeatTimes){//空格重复
+                var baseStr = "&nbsp;&nbsp;&nbsp;&nbsp;";
+                var returnStr="";
+                for(var i=0; i < repeatTimes-1; i++){
+                    returnStr += baseStr;
+                }
+                return returnStr;
+            },
+        },
+    });
+</script>
+
+<div class="bjui-pageContent">
+    <form action="/auth/auth/editAuthSave" id="editAuthForm" data-toggle="validate" data-alertmsg="false">
+        <div class="bjui-row col-1">
+            <input type="hidden" name="id" v-bind:value="auth.id">
+            <label class="row-label">权限名称：</label>
+            <div class="row-input required">
+                <input class="" name="name" type="text" v-model="auth.name" data-rule="required">
+            </div>
+
+            <label class="row-label">父权限：</label>
+            <div class="row-input required">
+                <select name="parentId" class="" data-toggle="selectpicker" v-model="auth.parentId" data-rule="checked">
+                    <option value="0">根权限</option>
+                    <option v-for="vo in authList"
+                            v-bind:value="vo.id"
+                            v-html="nbspRepeat(vo.level)+(vo.parentId==0 ? vo.name : '∟'+vo.name) ">
+                    </option>
+                </select>
+            </div>
+
+            <label class="row-label">权限检查等级：</label>
+            <div class="row-input required">
+                <select name="checkLevel" class="" data-toggle="selectpicker" v-model="auth.checkLevel" data-rule="checked">
+                    <option value="1">游客可访问</option>
+                    <option value="2">登陆可访问</option>
+                    <option value="3">授权可访问</option>
+                </select>
+            </div>
+
+            <label class="row-label">状态：</label>
+            <div class="row-input required">
+                <input name="status" value="1" data-toggle="icheck" data-label="正常" type="radio" v-model="auth.status" data-rule="checked">
+                <input name="status" value="2" data-toggle="icheck" data-label="禁用" type="radio" v-model="auth.status" data-rule="checked">
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="bjui-pageFooter">
+    <ul>
+        <li>
+            <button type="button" class="btn-close" data-icon="close">取消</button>
+        </li>
+        <li>
+            <button type="submit" class="btn-blue" data-icon="save">确定</button>
+        </li>
+    </ul>
+</div>

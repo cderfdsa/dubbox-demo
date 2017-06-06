@@ -1,0 +1,132 @@
+<script>
+    var nodeList = ${nodeList};
+    var parentIdMap = ${parentIdMap};
+    var openGifUrl = "/static/images/open.gif";
+    var closeGifUrl = "/static/images/close.gif";
+
+    var nodeListHeader = new Vue({
+        el:"#nodeListHeader",
+        data:{}
+    });
+
+    var nodeListTable = new Vue({
+        el:"#nodeListTable",
+        data:{
+            nodeList: nodeList,
+            parentIdMap:parentIdMap,
+            openGifUrl:openGifUrl,
+            closeGifUrl:closeGifUrl,
+        },
+        methods:{
+            deleteNode: function(nodeId){//删除节点
+                var uri = "/auth/node/deleteNode?nodeId="+nodeId;
+                BJUI.alertmsg("confirm", "确定删除当前节点吗？", {
+                    okCall: function() {
+                        BJUI.ajax('doajax', {
+                            url: uri,
+                            loadingmask: true,
+                            okCallback: function(json, options) {
+                                if(json.statusCode == BJUI.statusCode.ok){
+                                    BJUI.alertmsg("ok", "删除节点成功");
+                                }else{
+                                    BJUI.alertmsg("error", json.message);
+                                }
+                            }
+                        });
+                    }
+                });
+            },
+            isParent: function(nodeId){//判断是否属于父节点
+                if(typeof(this.parentIdMap[nodeId]) != "undefined"){
+                    return true;
+                }else{
+                    return false;
+                }
+            },
+            nbspRepeat: function(repeatTimes){//空格重复
+                var baseStr = "&nbsp;&nbsp;&nbsp;&nbsp;";
+                var returnStr="";
+                for(var i=0; i < repeatTimes-1; i++){
+                    returnStr += baseStr;
+                }
+                return returnStr;
+            },
+            formatTime: function(timeStamp){//格式化日期
+                return DateUtil.formatTime(timeStamp, "yyyy-MM-dd HH:mm:ss");
+            },
+            foldAndExpand: function(event){//节点展开、递归折叠
+                var target = event.target;
+                var id = $(target).attr('data-id');
+                var show = $(target).attr('src');
+                var child = $('tr[data-parentId=' + id + ']');
+                if(show == openGifUrl){
+                    child.removeClass("hidden");
+                    $(target).attr('src', closeGifUrl);
+                }else if(show == closeGifUrl){
+                    child.addClass("hidden");
+                    $(target).attr('src', openGifUrl);
+                    child.find(".nodeChange").attr('src', closeGifUrl).click().attr('src', openGifUrl);
+                }
+            },
+        },
+    });
+</script>
+
+<div class="bjui-pageHeader" id="nodeListHeader">
+    <a href="/auth/node/addNodeView" class="btn btn-green" data-toggle="dialog" data-id="add-node" data-height="600" data-width="600"
+       data-mask="true" data-icon="plus" v-if="access('/auth/node/addNodeView')">新建节点</a>&nbsp;
+</div>
+
+<div class="bjui-pageContent tableContent" >
+    <table class="table table-bordered table-hover" id="nodeListTable">
+        <thead>
+        <tr>
+            <th align="center">节点名称</th>
+            <th align="center">节点类型</th>
+            <th align="center">节点url</th>
+            <th align="center">单权限独占</th>
+            <th align="center">level</th>
+            <th align="center">排序</th>
+            <th align="center">状态</th>
+            <th align="center">添加时间</th>
+            <th align="center">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="(vo, index) in nodeList" v-bind:data-id="vo.id" v-bind:data-parentid="vo.parentId" v-bind:class="vo.parentId == 0 ? '':'hidden'">
+            <td title="节点名称">
+                <span v-html="nbspRepeat(vo.level)"></span>
+                <span v-if="isParent(vo.id)">
+                    <img v-bind:data-id="vo.id" class="nodeChange" @click="foldAndExpand($event)" v-bind:src="openGifUrl" alt=""
+                         style="cursor:pointer;"/>
+                </span>
+                <span v-else>{{nbspRepeat(1)}}</span>
+                <span>{{vo.parentId==0 ? vo.name : '∟'+vo.name}}</span>
+            </td>
+            <td align="center" title="节点类型">{{vo.type==1 ? '菜单' : '元素'}}</td>
+            <td title="节点url">{{vo.url}}</td>
+            <td align="center" title="单权限独占">{{vo.exclusive==1 ? '是' : '否'}}</td>
+            <td align="center" title="level">{{vo.level}}</td>
+            <td align="center" title="排序">{{vo.sort}}</td>
+            <td align="center" title="状态" v-bind:style="vo.status==1 ? 'color:green;' : ''">{{vo.status==1 ? '有效':'禁用'}}</td>
+            <td align="center" title="添加时间">{{formatTime(vo.createTime)}}</td>
+            <td align="center">
+                <a v-bind:href="'/auth/node/editNodeView?nodeId='+vo.id" data-toggle="dialog" data-mask="true" class="btn btn-blue"
+                   data-width="500" data-height="400" v-if="access('/auth/node/editNodeView')">编辑
+                </a>
+
+                <a v-bind:href="'/auth/node/addChildNode?nodeId='+vo.id" data-toggle="dialog" data-mask="true" class="btn btn-blue"
+                   data-width="500" data-height="600" v-if="access('/auth/node/addChildNode')">添加子节点
+                </a>
+
+                <a v-bind:href="'/auth/node/assignedAuthView?nodeId='+vo.id" data-toggle="dialog" data-mask="true" class="btn btn-blue"
+                   data-width="400" data-height="400" v-if="access('/auth/node/assignedAuthView')">已分配权限
+                </a>
+
+                <a @click="deleteNode(vo.id)" class="btn btn-red" v-if="access('/auth/node/deleteNode')">删除</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+

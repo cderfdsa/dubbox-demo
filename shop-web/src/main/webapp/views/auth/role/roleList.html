@@ -1,0 +1,80 @@
+<div class="bjui-pageHeader">
+    <a href="/auth/role/addRoleView" data-toggle="dialog" class="btn btn-green" data-options="{onClose:reloadNavtab}"
+       v-if="access('/auth/role/addRoleView')">添加角色</a>
+</div>
+
+<div class="bjui-pageContent">
+    <table class="table table-bordered table-striped table-hover" id="roleListTable">
+        <thead>
+        <tr>
+            <th style="text-align: center;">序号</th>
+            <th style="text-align: center;">角色名称</th>
+            <th style="text-align: center;">状态</th>
+            <th style="text-align: center;">备注</th>
+            <th style="text-align: center;">创建时间</th>
+            <th style="text-align: center;">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="(vo, index) in roleList">
+            <td align="center" title="序号">{{index+1}}</td>
+            <td align="center" title="角色名称">{{vo.name}}</td>
+            <td align="center" title="状态" v-if="vo.status==1" style="color: green;">启用</td>
+            <td align="center" title="状态" v-else>禁用</td>
+            <td align="center" title="备注">{{vo.remark}}</td>
+            <td align="center" title="创建时间">{{vo.createTime}}</td>
+            <td align="center" title="操作">
+                <a v-bind:href="'/auth/role/editRoleView?roleId='+vo.id" data-toggle="dialog" class="btn btn-blue" data-options="{onClose:reloadNavtab}"
+                   v-if="access('/auth/role/editRoleView')">编辑</a>&nbsp;
+
+                <a v-bind:href="'/auth/role/assignAuthView?roleId='+vo.id" data-toggle="dialog" class="btn btn-blue"
+                   data-height="800" data-width="700" v-if="access('/auth/role/assignAuthView')">分配权限</a>&nbsp;
+
+                <a v-bind:href="'/auth/role/assignUserView?roleId='+vo.id" data-toggle="dialog" class="btn btn-blue"
+                   v-if="access('/auth/role/assignUserView')">分配用户</a>&nbsp;
+
+                <a v-on:click="deleteRole('/auth/role/deleteRole?roleId='+vo.id)" class="btn btn-red"
+                   v-if="access('/auth/role/deleteRole')">删除</a>&nbsp;
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<script type="text/javascript">
+    var roleList = ${roleList};
+    var roleContainer;
+
+    $(function () {
+        roleContainer = new Vue({
+            el: '#roleListTable',
+            data: {
+                roleList: roleList,
+            },
+            methods: {
+                deleteRole: function(uri){
+                    BJUI.alertmsg('confirm', '确定删除角色吗？', {
+                        okCall: function() {
+                            BJUI.ajax('doajax', {
+                                url: uri,
+                                loadingmask: true,
+                                okCallback: function(json, options) {
+                                    if(json.statusCode == BJUI.statusCode.ok){
+                                        BJUI.alertmsg('ok', '删除角色成功');
+                                        reloadNavtab();
+                                    }else{
+                                        BJUI.alertmsg('error', json.message);
+                                    }
+                                }
+                            })
+                        }
+                    });
+                },
+            }
+        });
+    });
+
+    function reloadNavtab(){
+        BJUI.navtab("reload", {loadingmask:true});
+    }
+</script>

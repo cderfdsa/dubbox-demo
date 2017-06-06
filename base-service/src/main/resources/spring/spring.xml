@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://code.alibabatech.com/schema/dubbo
+       http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+
+
+        <!-- 事务处理 START -->
+        <!-- 定义基本事务,使用transactionManager作事务管理,配置get* find*方法的事务为readonly,其余方法按Spring默认设置(请参考Spring文档事务一章) -->
+        <tx:advice id="txAdvice" transaction-manager="transactionManager"><!-- transactionManager这个bean在MyBatisConfig.java里面定义了 -->
+                <tx:attributes>
+                        <tx:method name="get*" read-only="true" propagation="SUPPORTS" />
+                        <tx:method name="find*" read-only="true" propagation="SUPPORTS" />
+                        <tx:method name="*" read-only="false" propagation="REQUIRED" />
+                </tx:attributes>
+        </tx:advice>
+        <!-- 定义事务处理的切面 -->
+        <aop:config proxy-target-class="true">
+                <aop:advisor pointcut="execution(* com.cyf.base.business.*.biz.*Biz.*(..))" advice-ref="txAdvice" />
+        </aop:config>
+        <!-- 事务处理 END -->
+
+
+        <!-- dubbo配置 START -->
+        <!-- 应用程序名称 -->
+        <dubbo:application name="${applicationName}" />
+        <!-- dubbo包扫描路径：处理 @Service @Reference 等注解 -->
+        <dubbo:annotation package="${annotationPackage}" />
+        <!--服务提供方和消费方超时时间，单位ms-->
+        <dubbo:provider timeout="60000"/>
+        <dubbo:consumer timeout="60000"/>
+        <!-- 注册中心 -->
+        <dubbo:registry protocol="zookeeper" address="${registryAddress}" client="${registryClient}"/>
+        <!-- 监控中心 -->
+        <dubbo:monitor protocol="registry"/>
+        <!-- dubbo协议相关配置 -->
+        <dubbo:protocol name="dubbo" serialization="kryo" host="${serviceHost}" port="${dubboPort}" />
+</beans>

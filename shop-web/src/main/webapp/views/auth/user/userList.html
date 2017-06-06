@@ -1,0 +1,133 @@
+<script>
+    var userList = ${userList};
+    var username = "${username}";
+    var status = "${status}";
+
+    var authListHeader = new Vue({
+        el:"#userListHeader",
+        data:{
+            username: username,
+            status: status,
+        }
+    });
+
+    var authListTable = new Vue({
+        el:"#userListTable",
+        data:{
+            userList: userList,
+        },
+        methods:{
+            activeUser: function(authId){//启用用户
+                var uri = "/auth/user/activeUser?userId="+authId;
+                BJUI.alertmsg("confirm", "确定启用当前用户吗？", {
+                    okCall: function() {
+                        BJUI.ajax('doajax', {
+                            url: uri,
+                            loadingmask: true,
+                            okCallback: function(json, options) {
+                                if(json.statusCode == BJUI.statusCode.ok){
+                                    BJUI.alertmsg("ok", "启用用户成功");
+                                    freshNavtab();
+                                }else{
+                                    BJUI.alertmsg("error", json.message);
+                                }
+                            }
+                        });
+                    }
+                });
+            },
+            inactiveUser: function(authId){//禁用用户
+                var uri = "/auth/user/inactiveUser?userId="+authId;
+                BJUI.alertmsg("confirm", "禁用当前用户吗？", {
+                    okCall: function() {
+                        BJUI.ajax('doajax', {
+                            url: uri,
+                            loadingmask: true,
+                            okCallback: function(json, options) {
+                                if(json.statusCode == BJUI.statusCode.ok){
+                                    BJUI.alertmsg("ok", "禁用用户成功");
+                                    freshNavtab();
+                                }else{
+                                    BJUI.alertmsg("error", json.message);
+                                }
+                            }
+                        });
+                    }
+                });
+            },
+            formatTime: function(timeStamp){//格式化日期
+                return DateUtil.formatTime(timeStamp, "yyyy-MM-dd HH:mm:ss");
+            },
+        },
+    });
+    function freshNavtab(){
+        BJUI.navtab("refresh");
+    }
+</script>
+
+<div class="bjui-pageHeader" id="userListHeader">
+    <form id="searchUserForm" data-toggle="ajaxsearch" data-options="{url:'/auth/user/userList'}">
+        <div class="bjui-searchBar">
+            <label>姓名：</label>
+            <input type="text" name="username" class="form-control" v-bind:value="username" size="10">
+
+            <label>状态：</label>
+            <select name="status" class="form-control" data-toggle="selectpicker">
+                <option value="1" v-bind:selected="status == 1">有效</option>
+                <option value="2" v-bind:selected="status == 2">禁用</option>
+            </select>
+
+            <button type="submit" class="btn btn-green" data-icon="search">查询</button>
+        </div>
+    </form>
+</div>
+
+<div class="bjui-pageContent tableContent" >
+    <table class="table table-bordered table-hover" id="userListTable">
+        <thead>
+        <tr>
+            <th align="center">序号</th>
+            <th align="center">姓名</th>
+            <th align="center">性别</th>
+            <th align="center">手机</th>
+            <th align="center">邮箱</th>
+            <th align="center">状态</th>
+            <th align="center">添加时间</th>
+            <th align="center">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="(vo, index) in userList">
+            <td align="center" title="序号">{{index+1}}</td>
+            <td align="center" title="姓名">{{vo.username}}</td>
+            <td align="center" title="性别">
+                <span v-if="vo.gender==1">男</span>
+                <span v-else-if="vo.gender==2">女</span>
+                <span v-else-if="vo.gender==3">保密</span>
+            </td>
+            <td align="center" title="手机">{{vo.phone}}</td>
+            <td align="center" title="邮箱">{{vo.email}}</td>
+            <td align="center" title="状态" v-bind:style="vo.status==1 ? 'color:green;' : ''">{{vo.status==1 ? '有效':'禁用'}}</td>
+            <td align="center" title="添加时间">{{formatTime(vo.createTime)}}</td>
+            <td align="center">
+                <!--<a v-bind:href="'/auth/user/editUserView?userId='+vo.id" data-toggle="dialog" data-mask="true" class="btn btn-blue"-->
+                   <!--data-width="500" data-height="400" data-options="{onClose:freshNavtab}" v-if="access('/auth/user/editUserView')">编辑-->
+                <!--</a>-->
+
+                <a v-bind:href="'/auth/user/assignedRoleView?userId='+vo.id" data-toggle="dialog" data-mask="true" class="btn btn-blue"
+                   data-width="500" data-height="400" v-if="access('/auth/user/assignedRoleView')">已分配角色
+                </a>
+
+                <a @click="activeUser(vo.id)" class="btn btn-green" v-if="vo.status== 2 && access('/auth/user/activeUser')">启用</a>
+                <a @click="inactiveUser(vo.id)" class="btn btn-red" v-if="vo.status== 1 && access('/auth/user/inactiveUser')">禁用</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="bjui-pageFooter">
+    <div id="pagination" data-toggle="pagination"
+         data-options="{total:${pageParam.totalRecord}, pageCurrent:${pageParam.pageCurrent}, pageSize:${pageParam.pageSize}, form:'#searchUserForm'}">
+    </div>
+</div>

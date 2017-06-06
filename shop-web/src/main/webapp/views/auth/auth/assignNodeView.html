@@ -1,0 +1,103 @@
+<script type="text/javascript">
+    var auth = ${auth};
+    var assignVoList = ${assignVoList};
+    var nodeIdJsonStr = [];
+
+    initAuthAssignNode();
+
+    var assignNodeSaveForm = new Vue({
+        el:"#assignNodeSaveForm",
+        data:{
+            auth: auth,
+            assignVoList: assignVoList,
+            nodeIdJsonStr:nodeIdJsonStr,
+        },
+        methods:{
+            isNoCheck: function(vo){
+                if(vo.exclusive==1 && this.isNotEmpty(vo.assignedAuthIds) && !vo.isAssignedAuthId){
+                    return true;
+                }else{
+                    return false;
+                }
+            },
+            isNotEmpty: function(value){
+                if(typeof(value)=="undefined" || value==""|| value==null){
+                    return false;
+                }else{
+                    return true;
+                }
+            },
+        },
+    });
+
+    function initAuthAssignNode(){
+        for(var i=0; i<assignVoList.length; i++){
+            nodeIdJsonStr.push(assignVoList[i].authId);
+        }
+    }
+
+    function ZtreeClick() {
+        var zTree = $.fn.zTree.getZTreeObj("nodeAssignZtree");
+        var checkedNodes = zTree.getCheckedNodes();
+        var length = checkedNodes.length;
+
+        assignNodeSaveForm.nodeIdJsonStr = [];
+        for (var i = 0; i < length; i++) {
+            var id = checkedNodes[i].id;
+            assignNodeSaveForm.nodeIdJsonStr.push(id);
+        }
+    }
+</script>
+
+<div class="bjui-pageContent">
+    <form action="/auth/auth/assignNodeSave" id="assignNodeSaveForm" data-toggle="validate" data-alertmsg="false">
+        <input type="hidden" name="authId" v-bind:value="auth.id">
+        <input type="hidden" name="nodeIdJsonStr" id="nodeIdJsonStr" v-bind:value="nodeIdJsonStr">
+        <div style="margin:auto;">
+            <ul style="width: 100%;">
+                <li>
+                    <span class="t">权限名称:</span>
+                    <span class="info">{{auth.name}}</span>
+                </li>
+                <li>
+                    <span class="t">权限检查等级:</span>
+                    <span v-if="auth.checkLevel==1">游客可访问</span>
+                    <span v-else-if="auth.checkLevel==2">登陆可访问</span>
+                    <span v-else-if="auth.checkLevel==3">授权可访问</span>
+                </li>
+            </ul>
+        </div>
+
+        <div style="margin-top: 30px;">
+            <div>分配节点</div>
+            <div style="margin:auto auto auto 28%;">
+                <ul id="nodeAssignZtree" class="ztree" data-toggle="ztree" data-options="{
+                        expandAll: true,
+                        onClick: 'ZtreeClick',
+                        onCheck: 'ZtreeClick',
+                        setting:{
+                            check:{
+                                enable: true,
+                                chkStyle: 'checkbox',
+                                chkboxType: { 'Y': '', 'N': 's' }
+                            }
+                        }
+                    }">
+                    <li v-for="vo in assignVoList" v-bind:data-id="vo.nodeId" v-bind:data-pid="vo.parentId" v-bind:data-checked="vo.isAssignedAuthId"
+                        v-bind:data-nocheck="isNoCheck(vo)" data-faicon-close="cab">{{vo.name}}</li>
+                </ul>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="bjui-pageFooter">
+    <ul>
+        <li>
+            <button type="button" class="btn-close" data-icon="close">取消</button>
+        </li>
+        <li>
+            <button type="submit" class="btn-blue" data-icon="save">确定</button>
+        </li>
+    </ul>
+</div>

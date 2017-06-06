@@ -1,0 +1,31 @@
+<script>
+    var authNodeList = ${authNodeList};
+
+    var assignedAuthListTable = new Vue({
+        el:"#assignedAuthListTable",
+        data:{
+            authNodeList: authNodeList,
+        },
+    });
+</script>
+
+<div class="bjui-pageContent tableContent" >
+    <table class="table table-bordered table-hover" id="assignedAuthListTable">
+        <thead>
+        <tr>
+            <th align="center">节点名称</th>
+            <th align="center">节点类型</th>
+            <th align="center">权限名称</th>
+            <th align="center">权限分配时间</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="vo in authNodeList">
+            <td align="center" title="节点名称">{{vo.nodeName}}</td>
+            <td align="center" title="节点类型">{{vo.type==1 ? '菜单' : '元素'}}</td>
+            <td align="center" title="权限名称">{{vo.authName}}</td>
+            <td align="center" title="权限分配时间">{{vo.createTime}}</td>
+        </tr>
+        </tbody>
+    </table>
+</div>

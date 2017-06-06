@@ -1,0 +1,31 @@
+<script>
+    var user = ${user};
+    var roleUserList = ${roleUserList};
+
+    var assignedAuthListTable = new Vue({
+        el:"#assignedRoleListTable",
+        data:{
+            user: user,
+            roleUserList: roleUserList,
+        },
+    });
+</script>
+
+<div class="bjui-pageContent tableContent" >
+    <table class="table table-bordered table-hover" id="assignedRoleListTable">
+        <thead>
+        <tr>
+            <th align="center">用户名称</th>
+            <th align="center">角色名称</th>
+            <th align="center">角色分配时间</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="vo in roleUserList">
+            <td align="center" title="用户名称">{{user.username}}</td>
+            <td align="center" title="角色名称">{{vo.roleName}}</td>
+            <td align="center" title="角色分配时间">{{vo.createTime}}</td>
+        </tr>
+        </tbody>
+    </table>
+</div>

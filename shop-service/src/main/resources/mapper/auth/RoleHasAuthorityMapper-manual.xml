@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 存放手写的sql -->
+<mapper namespace="com.cyf.shop.auth.bean.RoleHasAuthority">
+    <select id="listRoleAssignAuth" resultType="com.cyf.shop.auth.vo.RoleAssignAuthVo">
+        SELECT
+        a.`id` as authId,
+        a.`name` as name,
+        a.`parent_id` as parentId,
+        a.`check_level` as checkLevel,
+        GROUP_CONCAT(DISTINCT b.`fk_role_id`) as assignedRoleIds
+        FROM
+        auth_authority a LEFT JOIN auth_role_has_authority b
+        ON a.`id` = b.`fk_authority_id` and a.status = 1 GROUP BY a.`id`
+    </select>
+</mapper>

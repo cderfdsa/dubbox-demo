@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cyf.shop.auth.bean.Authority">
+	<sql id="table"> auth_authority </sql>
+
+	<!-- 用于返回的bean对象 -->
+	<resultMap id="beanMap" type="com.cyf.shop.auth.bean.Authority">
+		<result column="id" property="id" jdbcType="BIGINT"/>
+		<result column="name" property="name" jdbcType="VARCHAR"/>
+		<result column="parentId" property="parentId" jdbcType="BIGINT"/>
+		<result column="level" property="level" jdbcType="TINYINT"/>
+		<result column="checkLevel" property="checkLevel" jdbcType="TINYINT"/>
+		<result column="status" property="status" jdbcType="TINYINT"/>
+		<result column="createTime" property="createTime" jdbcType="TIMESTAMP"/>
+		<result column="updateTime" property="updateTime" jdbcType="TIMESTAMP"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列，每一个字段都用as取一个别名时为了排序方便，也是为了其他自定义语句方便使用beanMap -->
+	<sql id="fields">
+		id as id,
+		name as name,
+		parent_id as parentId,
+		level as level,
+		check_level as checkLevel,
+		status as status,
+		create_time as createTime,
+		update_time as updateTime
+	</sql>
+
+	<!-- 多条件组合查询的条件(如：IN LIKE BETWEEN = > < 等等的查询) -->
+	<sql id="condWhere">
+		<where>
+			<if test="id != null">
+				AND id = #{id,jdbcType=BIGINT}
+			</if>
+			<if test="idList != null and idList.size() > 0">
+				AND id IN <foreach collection="idList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+			</if>
+			<if test="name != null and name != ''">
+				AND name = #{name,jdbcType=VARCHAR}
+			</if>
+			<if test="nameLike != null and nameLike != ''">
+				AND name LIKE CONCAT('%',#{nameLike,jdbcType=VARCHAR},'%')
+			</if>
+			<if test="parentId != null">
+				AND parent_id = #{parentId,jdbcType=BIGINT}
+			</if>
+			<if test="parentIdList != null and parentIdList.size() > 0">
+				AND parent_id IN <foreach collection="parentIdList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+			</if>
+			<if test="level != null">
+				AND level = #{level,jdbcType=TINYINT}
+			</if>
+			<if test="levelList != null and levelList.size() > 0">
+				AND level IN <foreach collection="levelList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=TINYINT}</foreach>
+			</if>
+			<if test="checkLevel != null">
+				AND check_level = #{checkLevel,jdbcType=TINYINT}
+			</if>
+			<if test="checkLevelList != null and checkLevelList.size() > 0">
+				AND check_level IN <foreach collection="checkLevelList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=TINYINT}</foreach>
+			</if>
+			<if test="status != null">
+				AND status = #{status,jdbcType=TINYINT}
+			</if>
+			<if test="statusList != null and statusList.size() > 0">
+				AND status IN <foreach collection="statusList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=TINYINT}</foreach>
+			</if>
+			<if test="createTimeStart != null">
+				AND create_time &gt;= #{createTimeStart,jdbcType=TIMESTAMP}
+			</if>
+			<if test="createTimeEnd != null">
+				AND create_time &lt; #{createTimeEnd,jdbcType=TIMESTAMP}
+			</if>
+			<if test="updateTimeStart != null">
+				AND update_time &gt;= #{updateTimeStart,jdbcType=TIMESTAMP}
+			</if>
+			<if test="updateTimeEnd != null">
+				AND update_time &lt; #{updateTimeEnd,jdbcType=TIMESTAMP}
+			</if>
+		</where>
+	</sql>
+
+	<!-- 插入记录 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="com.cyf.shop.auth.bean.Authority">
+		INSERT INTO <include refid="table" /> (
+        	id ,
+        	name ,
+        	parent_id ,
+        	level ,
+        	check_level ,
+        	status ,
+        	create_time ,
+        	update_time 
+        ) VALUES (
+        	#{id,jdbcType=BIGINT} ,
+        	#{name,jdbcType=VARCHAR} ,
+        	#{parentId,jdbcType=BIGINT} ,
+        	#{level,jdbcType=TINYINT} ,
+        	#{checkLevel,jdbcType=TINYINT} ,
+        	#{status,jdbcType=TINYINT} ,
+        	#{createTime,jdbcType=TIMESTAMP} ,
+        	#{updateTime,jdbcType=TIMESTAMP} 
+        )
+	</insert>
+
+	<!-- 批量插入记录 -->
+	<insert id="insertList" useGeneratedKeys="true" keyProperty="id" parameterType="list">
+		INSERT INTO <include refid="table" /> (
+        	id ,
+        	name ,
+        	parent_id ,
+        	level ,
+        	check_level ,
+        	status ,
+        	create_time ,
+        	update_time 
+        ) VALUES 
+		<foreach collection="list" item="item" separator=",">
+			(
+			#{item.id,jdbcType=BIGINT},
+			#{item.name,jdbcType=VARCHAR},
+			#{item.parentId,jdbcType=BIGINT},
+			#{item.level,jdbcType=TINYINT},
+			#{item.checkLevel,jdbcType=TINYINT},
+			#{item.status,jdbcType=TINYINT},
+			#{item.createTime,jdbcType=TIMESTAMP},
+			#{item.updateTime,jdbcType=TIMESTAMP}
+			)
+		</foreach>
+	</insert>
+
+	<!--动态删除-->
+	 <delete id="deleteBy">
+        DELETE FROM <include refid="table" /> <include refid="condWhere"/>  
+    </delete>
+    
+	<!--更新-->
+	<update id="update" parameterType="com.cyf.shop.auth.bean.Authority">
+        UPDATE <include refid="table" /> SET
+			name = #{name,jdbcType=VARCHAR},
+			parent_id = #{parentId,jdbcType=BIGINT},
+			level = #{level,jdbcType=TINYINT},
+			check_level = #{checkLevel,jdbcType=TINYINT},
+			status = #{status,jdbcType=TINYINT},
+			create_time = #{createTime,jdbcType=TIMESTAMP},
+			update_time = #{updateTime,jdbcType=TIMESTAMP}
+         WHERE id = #{id,jdbcType=BIGINT}
+	</update>
+
+	<!-- 只更新值不为null的字段 -->
+	<update id="updateIfNotNull" parameterType="com.cyf.shop.auth.bean.Authority">
+		UPDATE <include refid="table" />
+		<set>
+			<if test="name != null">
+				name=#{name,jdbcType=VARCHAR},
+			</if>
+			<if test="parentId != null">
+				parent_id=#{parentId,jdbcType=BIGINT},
+			</if>
+			<if test="level != null">
+				level=#{level,jdbcType=TINYINT},
+			</if>
+			<if test="checkLevel != null">
+				check_level=#{checkLevel,jdbcType=TINYINT},
+			</if>
+			<if test="status != null">
+				status=#{status,jdbcType=TINYINT},
+			</if>
+			<if test="createTime != null">
+				create_time=#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				update_time=#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		WHERE id = #{id,jdbcType=BIGINT}
+	</update>
+	
+	<!-- 批量更新 -->
+	<update id="updateList" parameterType="list">
+        UPDATE <include refid="table" /> SET
+			name = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.name,jdbcType=VARCHAR}
+			</foreach>
+			,
+			parent_id = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.parentId,jdbcType=BIGINT}
+			</foreach>
+			,
+			level = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.level,jdbcType=TINYINT}
+			</foreach>
+			,
+			check_level = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.checkLevel,jdbcType=TINYINT}
+			</foreach>
+			,
+			status = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.status,jdbcType=TINYINT}
+			</foreach>
+			,
+			create_time = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.createTime,jdbcType=TIMESTAMP}
+			</foreach>
+			,
+			update_time = 
+			<foreach collection="list" item="item" index="index" open="case id" separator=" " close="end">
+				when #{item.id,jdbcType=BIGINT} then #{item.updateTime,jdbcType=TIMESTAMP}
+			</foreach>
+			
+		WHERE id IN <foreach collection="list" item="item" index="index" open="(" separator="," close=")">#{item.id,jdbcType=BIGINT}</foreach>
+	</update>
+
+	<!-- 多条件精确查询时计算总记录数 -->
+    <select id="countByCond" resultType="int">
+        SELECT count(*) FROM <include refid="table" /> 
+		<include refid="condWhere"/>
+    </select>
+
+	<!-- 多条件组合查询 -->
+    <select id="listByCond" resultMap="beanMap">
+    	SELECT <include refid="fields" />
+	    FROM <include refid="table" /> 
+		<include refid="condWhere"/>
+		<if test="sortColumns != null">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+	
+	<!-- 取得所有记录，只在表数据量少时使用 -->
+    <select id="listAll" resultMap="beanMap">
+    	SELECT <include refid="fields" />
+	    FROM <include refid="table" /> 
+		<if test="sortColumns != null">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+	<!-- 多条件组合查询，然后由mybatis转成Map之后返回，key字段在调用时指定 -->
+    <select id="mapByCond" resultMap="beanMap">
+    	SELECT <include refid="fields" />
+	    FROM <include refid="table" /> 
+		<include refid="condWhere"/>
+    </select>
+
+	<!-- 根据唯一键查询(如果有的话) -->
+
+
+	<!--按id主键删除-->
+	<delete id="deleteById">
+        DELETE FROM <include refid="table" /> WHERE id = #{id,jdbcType=BIGINT}
+    </delete>
+
+	<!--按多个id主键删除-->
+	<delete id="deleteByIdList">
+        DELETE FROM <include refid="table" /> 
+		WHERE id in <foreach collection="list" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+    </delete>
+    
+	<!-- 根据id查询 -->
+    <select id="getById" resultMap="beanMap">
+		SELECT <include refid="fields" /> 
+		FROM <include refid="table" /> 
+		WHERE id = #{id,jdbcType=BIGINT}  
+	</select>
+
+	<!-- 根据多个id批量查询 -->
+	<select id="listByIdList" resultMap="beanMap">
+		SELECT <include refid="fields" /> 
+		FROM <include refid="table" /> 
+		WHERE id in 
+		<foreach collection="list" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+	</select>
+
+	<!-- 多条件组合查询，然后由mybatis转成以id为key的Map之后返回 -->
+    <select id="mapByIdCond" resultMap="beanMap">
+    	SELECT <include refid="fields" />
+	    FROM <include refid="table" /> 
+		<include refid="condWhere"/>
+    </select>
+</mapper>
+

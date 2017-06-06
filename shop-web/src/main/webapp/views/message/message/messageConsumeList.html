@@ -1,0 +1,133 @@
+<script>
+    var messageList = ${messageList};
+    var type = "${type}";
+    var name = "${name}";
+    var messageDesc = "${messageDesc}";
+    var createTimeStart = "${createTimeStart}";
+    var createTimeEnd = "${createTimeEnd}";
+    var isTimer = "${isTimer}";
+
+    var messageListHeader = new Vue({
+        el:"#messageListHeader",
+        data:{
+            type: type,
+            name: name,
+            messageDesc: messageDesc,
+            isTimer: isTimer,
+            createTimeStart: createTimeStart,
+            createTimeEnd: createTimeEnd,
+        }
+    });
+
+    var authListTable = new Vue({
+        el:"#messageListTable",
+        data:{
+            messageList: messageList,
+        },
+        methods:{
+            deleteMessage: function(messageId){//删除已消费消息
+                var uri = "/message/message/deleteMessage?id="+messageId;
+                BJUI.alertmsg("confirm", "确定删除当前已消费消息吗？", {
+                    okCall: function() {
+                        BJUI.ajax('doajax', {
+                            url: uri,
+                            loadingmask: true,
+                            okCallback: function(json, options) {
+                                if(json.statusCode == BJUI.statusCode.ok){
+                                    BJUI.alertmsg("ok", "删除当前已消费消息成功");
+                                    freshNavtab();
+                                }else{
+                                    BJUI.alertmsg("error", json.message);
+                                }
+                            }
+                        });
+                    }
+                });
+            },
+            formatTime: function(timeStamp){//格式化日期
+                return DateUtil.formatTime(timeStamp, "yyyy-MM-dd HH:mm:ss");
+            },
+        },
+    });
+    function freshNavtab(){
+        BJUI.navtab("refresh");
+    }
+</script>
+
+<div class="bjui-pageHeader" id="messageListHeader">
+    <form id="searchMessageForm" data-toggle="ajaxsearch" data-options="{url:'/message/message/messageConsumeList'}">
+        <div class="bjui-searchBar">
+            <label>消息类型：</label>
+            <select name="type" class="form-control" data-toggle="selectpicker">
+                <option value="">请选择</option>
+                <option value="1" v-bind:selected="type == 1">queue</option>
+                <option value="2" v-bind:selected="type == 2">topic</option>
+            </select>
+
+            <label>消息名称：</label>
+            <input type="text" name="name" class="form-control" v-bind:value="name" size="20" placeholder="精确查询">
+
+            <label>消息描述：</label>
+            <input type="text" name="messageDesc" class="form-control" v-bind:value="messageDesc" size="20" placeholder="模糊查询">
+
+            <label>开始时间：</label>
+            <input type="text" name="createTimeStart" class="form-control" v-bind:value="createTimeStart" data-toggle="datepicker"
+                   data-pattern="yyyy-MM-dd HH:mm:ss">
+
+            <label>结束时间：</label>
+            <input type="text" name="createTimeEnd" class="form-control" v-bind:value="createTimeEnd" data-toggle="datepicker"
+                   data-pattern="yyyy-MM-dd HH:mm:ss">
+
+            <label>定时任务：</label>
+            <select name="isTimer" class="form-control" data-toggle="selectpicker">
+                <option value="">请选择</option>
+                <option value="1" v-bind:selected="isTimer == 1">是</option>
+                <option value="2" v-bind:selected="isTimer == 2">否</option>
+            </select>
+
+            <button type="submit" class="btn btn-green" data-icon="search">查询</button>
+        </div>
+    </form>
+</div>
+
+<div class="bjui-pageContent tableContent" >
+    <table class="table table-bordered table-hover" id="messageListTable">
+        <thead>
+        <tr>
+            <th align="center">序号</th>
+            <th align="center">id</th>
+            <th align="center">消息名称</th>
+            <th align="center">消息类型</th>
+            <th align="center">参数</th>
+            <th align="center">消费者</th>
+            <th align="center">消费时间</th>
+            <th align="center">属于定时消息</th>
+            <th align="center">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="(vo, index) in messageList">
+            <td align="center" title="序号">{{index+1}}</td>
+            <td align="center" title="id">{{vo.id}}</td>
+            <td align="center" title="消息名称">{{vo.name}}</td>
+            <td align="center" title="消息类型">
+                <span v-if="vo.type==1">queue</span>
+                <span v-else-if="vo.type==2">topic</span>
+            </td>
+            <td align="center" title="参数">{{vo.payload}}</td>
+            <td align="center" title="消费者">{{vo.consumer}}</td>
+            <td align="center" title="消费时间">{{formatTime(vo.createTime)}}</td>
+            <td align="center" title="属于定时消息">{{vo.isTimer==1?"是":""}}</td>
+            <td align="center">
+                <a @click="deleteMessage(vo.id)" class="btn btn-red" v-if="access('/message/message/deleteMessage')">删除</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="bjui-pageFooter">
+    <div id="pagination" data-toggle="pagination"
+         data-options="{total:${pageParam.totalRecord}, pageCurrent:${pageParam.pageCurrent}, pageSize:${pageParam.pageSize}, form:'#searchMessageForm'}">
+    </div>
+</div>
