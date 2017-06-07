@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
  * @Description：RedissonClient是redis的java客户端，跟redis连接只是其最基本的功能，并且还提供自动重连的机制，除此之外，
  *      它还提供多种分布式对象，特别适合在分布式环境下使用，RSet、RList、RMap、RLock等等对象的使用方法，完全跟java原生的
  *      Set、List、Lock的使用方法一样，因为Redisson提供的对象都是有重写父类中的方法的，都是能够支持分布式操作的，而对于分布式锁
- *      {@link org.redisson.RedissonLock}，如果客户端连接断开，则会自动释放锁
+ *      {@link org.redisson.RedissonLock}，如果客户端连接断开，则会自动释放锁，更多资料可以查看：https://github.com/redisson/redisson/wiki
  *
  * @Author： chenyf
  * @Version： V1.0
@@ -86,13 +86,33 @@ public class Redisson {
     }
 
     /**
-     * 获取Map对象
-     * @param objectName
+     * 获取Map对象，是有序的，最大数量受限于redis，为4 294 967 295
+     * @param name
      * @return {@link org.redisson.RedissonMap}
      */
-    public <K,V> RMap<K, V> getRMap(String objectName){
-        RMap<K, V> map = redissonClient.getMap(objectName);
+    public <K,V> RMap<K, V> getRMap(String name){
+        RMap<K, V> map = redissonClient.getMap(name);
         return map;
+    }
+
+    /**
+     * 获取RListMultimap对象，允许在一个key下存储多个值，有点类似数据表的按列存储
+     * @param <K>
+     * @param <V>
+     * @return {@link org.redisson.RedissonListMultimap}
+     */
+    public <K, V> RListMultimap<K, V> getRListMultimap(String name){
+        return redissonClient.getListMultimap(name);
+    }
+
+    /**
+     * 获取RSetMultimap对象，允许在一个key下存储多个不重复的值，有点类似数据表的按列存储
+     * @param <K>
+     * @param <V>
+     * @return {@link org.redisson.RedissonSetMultimap}
+     */
+    public <K, V> RSetMultimap<K, V> getRSetMultimap(String name){
+        return redissonClient.getSetMultimap(name);
     }
 
     /**
