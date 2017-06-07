@@ -35,7 +35,6 @@ public class Redisson {
         }else{//其他情况都只启用单点模式
             config.useSingleServer().setPassword(password).setAddress(urlArr[0]);
         }
-        //create方法实际返回的是 org.redisson.Redisson 这个类对象，这个类是 org.redisson.api.RedissonClient 的实现类
         instance.redissonClient = org.redisson.Redisson.create(config);
         return instance;
     }
@@ -65,7 +64,15 @@ public class Redisson {
     }
 
     public boolean del(String key){
-        return getRBucket(key).delete();
+        return redissonClient.getKeys().delete(key) > 0;
+    }
+
+    /**
+     * 获取RKey对象，通过key可以CRUD
+     * @return {@link org.redisson.RedissonKeys}
+     */
+    public RKeys getRKeys(){
+        return redissonClient.getKeys();
     }
 
     /**
