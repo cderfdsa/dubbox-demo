@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 /**
- * @Title：
+ * @Title：redis配置类
  * @Description：
  * @Author： chenyf
  * @Version： V1.0

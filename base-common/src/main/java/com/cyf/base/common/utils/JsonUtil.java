@@ -17,6 +17,9 @@ import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.util.*;
 
+/**
+ * Json工具类
+ */
 public final class JsonUtil {
 	/**
 	 * 将一个对像转成一个json字符串

@@ -1,7 +1,7 @@
 package com.cyf.shop.auth.vo;
 
 /**
- * @Title：
+ * @Title：角色分配权限的vo
  * @Description：
  * @Author： chenyf
  * @Version： V1.0

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * 角色服务
  * Created by chenyf on 2017/4/9.
  */
 public interface RoleService {

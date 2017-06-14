@@ -15,6 +15,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 具体发送MQ消息的类
+ */
 @Component
 public class MessageSender {
 	private static LoggerWrapper logger = LoggerWrapper.getLoggerWrapper();

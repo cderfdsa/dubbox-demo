@@ -10,7 +10,7 @@ import java.util.Map;
  * @Description：基础返回信息,可用于service统一返回格式
  * @Author： chenyf
  * @Version： V1.0
- * @Date： 2017/3/8 14:31
+ * @Date： 2017/3/8
  */
 public class BaseResponse<T> implements Serializable {
     // 成功码

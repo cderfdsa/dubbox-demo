@@ -14,7 +14,7 @@ import javax.jms.Topic;
 import java.util.List;
 
 /**
- * @Title：
+ * @Title：消息服务实现类
  * @Description：
  * @Author： chenyf
  * @Version： V1.0

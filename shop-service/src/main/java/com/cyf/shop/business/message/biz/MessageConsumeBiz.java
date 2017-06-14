@@ -13,11 +13,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @Title：
+ * @Title：消息消费服务biz
  * @Description：
  * @Author： chenyf
  * @Version： V1.0
- * @Date： 2017/5/12 10:54
+ * @Date： 2017/5/12
  */
 @Component
 public class MessageConsumeBiz {

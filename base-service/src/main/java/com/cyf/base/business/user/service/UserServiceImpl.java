@@ -12,11 +12,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @Title：
+ * @Title：用户服务实现类
  * @Description：
  * @Author： chenyf
  * @Version： V1.0
- * @Date： 2017/5/9 15:00
+ * @Date： 2017/5/9
  */
 @Service
 public class UserServiceImpl implements UserService {

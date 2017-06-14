@@ -8,6 +8,7 @@ import com.cyf.shop.auth.vo.AuthAssignNodeVo;
 import java.util.List;
 
 /**
+ * 权限服务
  * Created by chenyf on 2017/4/9.
  */
 public interface AuthService {

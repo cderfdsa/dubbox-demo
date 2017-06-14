@@ -11,7 +11,7 @@ import org.springframework.web.servlet.ModelAndView;
  * @Description：
  * @Author： chenyf
  * @Version： V1.0
- * @Date： 2017/3/21 10:39
+ * @Date： 2017/3/21
  */
 @Controller
 @RequestMapping("goods/goods")

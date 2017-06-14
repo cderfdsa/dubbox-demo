@@ -4,6 +4,9 @@ import org.apache.logging.log4j.ThreadContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 日志对象
+ */
 public class LoggerWrapper {
     private static final String DEFAULT_LOGGER = "application";//这个名称需要跟log4j2.xml配置的一样
     public static final String SEPARATE_LOGGER_NAME = "separate";//log4j2 中定义的可以输出独立日志文件的那个logger名称

@@ -20,11 +20,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
 /**
- * @Title：
+ * @Title：index控制器
  * @Description：
  * @Author： chenyf
  * @Version： V1.0
- * @Date： 2017/3/21 10:39
+ * @Date： 2017/3/21
  */
 @Controller
 @RequestMapping("index/index")

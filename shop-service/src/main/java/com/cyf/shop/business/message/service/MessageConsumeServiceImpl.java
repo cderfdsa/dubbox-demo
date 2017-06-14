@@ -12,11 +12,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @Title：
+ * @Title：消息消费服务实现类
  * @Description：
  * @Author： chenyf
  * @Version： V1.0
- * @Date： 2017/5/12 12:08
+ * @Date： 2017/5/12
  */
 @Service
 public class MessageConsumeServiceImpl implements MessageConsumeService {

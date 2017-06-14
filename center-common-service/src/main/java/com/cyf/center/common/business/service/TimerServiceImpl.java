@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * 定时任务实现类
  * Created by chenyf on 2017/3/7.
  */
 @Service

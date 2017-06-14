@@ -7,6 +7,7 @@ import com.cyf.shop.auth.bean.Node;
 import java.util.List;
 
 /**
+ * 节点/菜单服务
  * Created by chenyf on 2017/4/9.
  */
 public interface NodeService {

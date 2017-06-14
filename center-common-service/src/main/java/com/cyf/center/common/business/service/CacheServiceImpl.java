@@ -6,6 +6,7 @@ import com.cyf.base.common.utils.JsonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
+ * 缓存服务实现类
  * Created by chenyf on 2017/3/31.
  */
 @Service

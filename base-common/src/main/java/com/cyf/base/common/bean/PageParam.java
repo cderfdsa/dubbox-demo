@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @Title：
+ * @Title：分页查询参数
  * @Description：
  * @Author： chenyf
  * @Version： V1.0

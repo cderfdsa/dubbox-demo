@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 /**
+ * 配置类
  * Created by chenyf on 2017/3/13.
  */
 @Configuration

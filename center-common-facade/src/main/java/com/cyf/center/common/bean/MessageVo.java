@@ -3,6 +3,7 @@ package com.cyf.center.common.bean;
 import java.io.Serializable;
 
 /**
+ * 消息vo
  * Created by chenyf on 2017/3/6.
  */
 public class MessageVo implements Serializable{

@@ -10,8 +10,6 @@ import java.security.SecureRandom;
 
 /**
  * 加解密工具类
- * 
- * @author Winter Lau
  */
 public class CryptUtil {
 

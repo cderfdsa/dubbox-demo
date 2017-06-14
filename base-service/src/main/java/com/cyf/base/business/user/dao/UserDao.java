@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * 用户dao
  * Created by chenyf on 2017/3/25.
  */
 @Repository

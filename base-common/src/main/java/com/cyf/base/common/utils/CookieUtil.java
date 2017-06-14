@@ -6,11 +6,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- *(C) 2014-2015, O2OMedical Inc. All rights reserved.
- *
- * @author musilin
- * @author zhangxuerong
- * @date 2015年9月24日
+ * @date
  */
 public class CookieUtil {
 

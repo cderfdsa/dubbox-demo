@@ -28,7 +28,7 @@ public class UserUtil {
      * @return
      */
     public static User getUser(String uniqueId){
-        return CONTAINER.getOrDefault(uniqueId, null);
+        return CONTAINER.get(uniqueId);
     }
 
 }

@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @Title：
+ * @Title：定时任务vo
  * @Description：
  * @Author： chenyf
  * @Version： V1.0

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.Random;
 
 /**
+ * @Description:token服务
  * @Author: chenyf
  * @Date: 2016/8/22
  * @Description: 描述

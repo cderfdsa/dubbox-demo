@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @Author： chenyf
  * @Version： V1.0
- * @Date： 2017/5/11 16:46
+ * @Date： 2017/5/11
  */
 public class Redisson {
     /**
