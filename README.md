@@ -3,7 +3,7 @@
     整个项目的核心思想的是面向服务理念，主要使用 Spring4.3 + Dubbox2.8.4 + Mybatis3框架，以注解配置为主，xml配置为辅的方式进行搭建，
     而web项目则引入了springMVC作为服务器端框架，使用 BJUI + Vue 作为前端UI框架，同时使用freemarker作为模板引擎，另外，还引入Quartz作为
     定时任务框架，可实现动态管理定时任务，引入ActiveMQ作为消息中间件，使用Redis作为缓存框架，使用elasticsearch作为搜索引擎，所以，本项目是
-    Spring + Dubbox + Mybatis + elasticserch + activemq + quartz + springMVC + freemarker + Vue + BJUI 的整合项目
+    Spring + Dubbox + Mybatis + elasticserch + activemq + quartz + redis + springMVC + freemarker + Vue + BJUI 的整合项目
 
 2、demo各模块说明：
     demo包含的模块及各模块作用如下：
